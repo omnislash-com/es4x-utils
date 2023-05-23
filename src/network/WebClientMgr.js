@@ -3,6 +3,7 @@ import { WebClient } from '@vertx/web-client';
 import { Buffer } from '@vertx/core';
 
 const { LogUtils } = require("../utils/LogUtils");
+const { QueryUtils } = require("./QueryUtils");
 
 class	WebClientMgr
 {
@@ -13,7 +14,45 @@ class	WebClientMgr
 		opt.setTrustAll(true);				 
 
 		this.__webClient = WebClient.create(_vertx, opt);
-	}	
+	}
+
+	async	query(_method, _host, _path, _data = null, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true)
+	{
+		// depending on the method
+		let	result = null;
+
+		// GET
+		if (_method == QueryUtils.HTTP_METHOD_GET)
+		{
+			result = await this.get(_host, _path, _headers, _toJson, _port, _ssl);
+		}
+		// DELETE
+		else if (_method == QueryUtils.HTTP_METHOD_DEL)
+		{
+			result = await this.delete(_host, _path, _headers, _toJson, _port, _ssl);
+		}				
+		// POST
+		else if (_method == QueryUtils.HTTP_METHOD_POST)
+		{
+			result = await this.post(_host, _path, _data, _headers, _toJson, _dataIsJson, _port, _ssl);
+		}				
+		// PATCH
+		else if (_method == QueryUtils.HTTP_METHOD_PATCH)
+		{
+			result = await this.patch(_host, _path, _data, _headers, _toJson, _dataIsJson, _port, _ssl);
+		}				
+		// PUT
+		else if (_method == QueryUtils.HTTP_METHOD_PUT)
+		{
+			result = await this.put(_host, _path, _data, _headers, _toJson, _dataIsJson, _port, _ssl);
+		}
+		else 
+		{
+			LogUtils.LogError("Error: unknown method: " + _query.method);
+		}
+
+		return result;
+	}
 
 	async	get(_host, _path, _headers = {}, _toJson = false, _port = 443, _ssl = true)
 	{
@@ -95,6 +134,29 @@ class	WebClientMgr
 
 		// create the request
 		let	request = this.__webClient.patch(_port, _host, _path);
+
+		// set SSL
+		request = request.ssl(_ssl);
+
+		// send it
+		return await this.sendRequest(query, request, _headers, _toJson, _data, _dataIsJson);
+	}		
+
+	async	put(_host, _path, _data, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true)
+	{
+		// save the param object
+		let	query = {
+			host: _host,
+			path: _path,
+			port: _port,
+			data: _data,
+			headers: _headers,
+			toJson: _toJson,
+			dataIsJson: _dataIsJson
+		};
+
+		// create the request
+		let	request = this.__webClient.put(_port, _host, _path);
 
 		// set SSL
 		request = request.ssl(_ssl);

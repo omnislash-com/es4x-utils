@@ -35,6 +35,7 @@
 		"test:MathUtils": "es4x test tests/MathUtils.test.js",
 		"test:ObjUtils": "es4x test tests/ObjUtils.test.js",
 		"test:StringUtils": "es4x test tests/StringUtils.test.js",
-		"test:UrlUtils": "es4x test tests/UrlUtils.test.js"
+		"test:UrlUtils": "es4x test tests/UrlUtils.test.js",
+		"test:WebClientMgr": "es4x test tests/WebClientMgr.test.js"
 	}
 }

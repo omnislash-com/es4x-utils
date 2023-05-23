@@ -1,5 +1,6 @@
 import { HttpMethod } from '@vertx/core/options';
 
+
 const { ObjUtils } = require("../utils/ObjUtils");
 const { StringUtils } = require("../utils/StringUtils");
 const { LogUtils } = require("../utils/LogUtils");
@@ -10,6 +11,7 @@ class	QueryUtils
 	static	get	HTTP_METHOD_POST()		{	return "post"; }
 	static	get	HTTP_METHOD_PUT()		{	return "put"; }
 	static	get	HTTP_METHOD_DEL()		{	return "delete"; }
+	static	get	HTTP_METHOD_PATCH()		{	return "patch"; }
 
 	static	get	PARAM_PATH()		{	return "param_path"; }
 	static	get	PARAM_QUERY()		{	return "param_query"; }
@@ -207,11 +209,27 @@ class	QueryUtils
 			return QueryUtils.HTTP_METHOD_PUT;
 		else if (method.contains(HttpMethod.DELETE))
 			return QueryUtils.HTTP_METHOD_DEL;
+		else if (method.contains(HttpMethod.PATCH))
+			return QueryUtils.HTTP_METHOD_PATCH;
 		else
 		{
 			LogUtils.LogError("Unknown method!");
 			return QueryUtils.HTTP_METHOD_GET;
 		}
+	}
+
+	static	StringToHttpMethod(_methodStr)
+	{
+		if (_methodStr == QueryUtils.HTTP_METHOD_POST)
+			return HttpMethod.POST;
+		else if (_methodStr == QueryUtils.HTTP_METHOD_DEL)
+			return HttpMethod.DELETE;
+		else if (_methodStr == QueryUtils.HTTP_METHOD_PUT)
+			return HttpMethod.PUT;
+		else if (_methodStr == QueryUtils.HTTP_METHOD_PATCH)
+			return HttpMethod.PATCH;
+		else
+			return HttpMethod.GET;
 	}
 
 	static	create(_ctx)
