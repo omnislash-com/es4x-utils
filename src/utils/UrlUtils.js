@@ -1,3 +1,4 @@
+const { CoreUtils } = require("../utils/CoreUtils");
 const { ObjUtils } = require("./ObjUtils");
 const { StringUtils } = require("./StringUtils");
 
@@ -25,7 +26,7 @@ class	UrlUtils
 			let	currentUrl = parse(_url, true);
 
 			// do we have the query?
-			if (ObjUtils.IsObject(currentUrl.query) == true)
+			if (CoreUtils.IsObject(currentUrl.query) == true)
 			{
 				for(let key of _parameters)
 				{

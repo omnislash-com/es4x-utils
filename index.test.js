@@ -1,7 +1,9 @@
 /// <reference types="@vertx/core" />
 // @ts-check
 import { TestSuite } from '@vertx/unit';
+import { CoreUtils } from './src/utils/CoreUtils';
 import { ObjUtils } from './src/utils/ObjUtils';
+import { ArrayUtils } from './src/utils/ArrayUtils';
 import { StringUtils } from './src/utils/StringUtils';
 import { DateUtils } from './src/utils/DateUtils';
 import { JavaUtils } from './src/utils/JavaUtils';
@@ -389,13 +391,13 @@ suite.test("StringUtils.ToFloat", function (context) {
 
 });
 
-suite.test("ObjUtils.IsArrayEmpty", function (context) {
+suite.test("ArrayUtils.IsEmpty", function (context) {
 
-	context.assertEquals(ObjUtils.IsArrayEmpty(null), true);
-	context.assertEquals(ObjUtils.IsArrayEmpty([]), true);
-	context.assertEquals(ObjUtils.IsArrayEmpty("test"), true);
-	context.assertEquals(ObjUtils.IsArrayEmpty([1]), false);
-	context.assertEquals(ObjUtils.IsArrayEmpty(["test", "test2"]), false);
+	context.assertEquals(ArrayUtils.IsEmpty(null), true);
+	context.assertEquals(ArrayUtils.IsEmpty([]), true);
+	context.assertEquals(ArrayUtils.IsEmpty("test"), true);
+	context.assertEquals(ArrayUtils.IsEmpty([1]), false);
+	context.assertEquals(ArrayUtils.IsEmpty(["test", "test2"]), false);
 
 });
 
@@ -1328,7 +1330,7 @@ suite.test("JsonProcessor.process", function (context) {
 		let	value = processor.process(key);
 
 		// compare
-		if ( (ObjUtils.IsArray(tests[key]) == true) && (ObjUtils.IsArray(value) == true) )
+		if ( (CoreUtils.IsArray(tests[key]) == true) && (CoreUtils.IsArray(value) == true) )
 		{
 			if (value.length != tests[key].length)
 			{
@@ -2177,7 +2179,7 @@ suite.test("DateUtils.FormatDurationFromSec", function (context) {
 
 });
 
-suite.test("ObjUtils.CompareArrays", function (context) {
+suite.test("ArrayUtils.Compare", function (context) {
 
 	let	tests = [
 		{
@@ -2214,7 +2216,7 @@ suite.test("ObjUtils.CompareArrays", function (context) {
 
 	for(let i=0; i<tests.length; i++)
 	{
-		let	result = ObjUtils.CompareArrays(tests[i].array1, tests[i].array2);
+		let	result = ArrayUtils.Compare(tests[i].array1, tests[i].array2);
 		if (result != tests[i].result)
 			console.error("Error with test " + i);
 	
@@ -4624,7 +4626,7 @@ suite.test("ObjUtils.FillList", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.FillList(tests[i].count, tests[i].start, tests[i].step);
+		let	result = ArrayUtils.Fill(tests[i].count, tests[i].start, tests[i].step);
 
 		// compare the size
 		if (result.length != tests[i].count)
@@ -4647,7 +4649,7 @@ suite.test("ObjUtils.FillList", function (context) {
 
 });
 
-suite.test("ObjUtils.ListToString", function (context) {
+suite.test("ArrayUtils.ConvertElementsToString", function (context) {
 
 	let	tests = [
 		{
@@ -4675,7 +4677,7 @@ suite.test("ObjUtils.ListToString", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.ListToString(tests[i].list);
+		let	result = ArrayUtils.ConvertElementsToString(tests[i].list);
 
 		// compare the size
 		if (result.length != tests[i].list.length)
@@ -4699,7 +4701,7 @@ suite.test("ObjUtils.ListToString", function (context) {
 });
 
 
-suite.test("ObjUtils.InvertListValues", function (context) {
+suite.test("ArrayUtils.InvertValues", function (context) {
 
 	let	tests = [
 		{
@@ -4726,7 +4728,7 @@ suite.test("ObjUtils.InvertListValues", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.InvertListValues(tests[i].list, tests[i].max);
+		let	result = ArrayUtils.InvertValues(tests[i].list, tests[i].max);
 
 		// compare the size
 		if (result.length != tests[i].list.length)
@@ -4750,7 +4752,7 @@ suite.test("ObjUtils.InvertListValues", function (context) {
 });
 
 
-suite.test("ObjUtils.FillListColor", function (context) {
+suite.test("ArrayUtils.FillWithColor", function (context) {
 
 	let	tests = [
 		{
@@ -4769,7 +4771,7 @@ suite.test("ObjUtils.FillListColor", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.FillListColor(tests[i].count, tests[i].color);
+		let	result = ArrayUtils.FillWithColor(tests[i].count, tests[i].color);
 
 		// compare the size
 		if (result.length != tests[i].count)
@@ -4796,7 +4798,7 @@ suite.test("ObjUtils.FillListColor", function (context) {
 
 });
 
-suite.test("ObjUtils.ReverseList", function (context) {
+suite.test("ArrayUtils.Reverse", function (context) {
 
 	let	tests = [
 		{
@@ -4817,7 +4819,7 @@ suite.test("ObjUtils.ReverseList", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.ReverseList(tests[i].list);
+		let	result = ArrayUtils.Reverse(tests[i].list);
 
 		// compare the size
 		if (result.length != tests[i].list.length)
@@ -6850,13 +6852,13 @@ suite.test("ObjUtils.ReplaceAllIdsWithObjectInList2", function (context) {
 });
 
 
-suite.test("ObjUtils.FindMissingEntriesInArray", function (context) {
+suite.test("ArrayUtils.FindMissingEntries", function (context) {
 
-	assertListEquals(context, ObjUtils.FindMissingEntriesInArray(null, undefined), []);	
-	assertListEquals(context, ObjUtils.FindMissingEntriesInArray([], undefined), []);	
-	assertListEquals(context, ObjUtils.FindMissingEntriesInArray([], ["test"]), ["test"]);	
-	assertListEquals(context, ObjUtils.FindMissingEntriesInArray(["test"], ["test"]), []);	
-	assertListEquals(context, ObjUtils.FindMissingEntriesInArray(["test"], ["test", "Test"]), ["Test"]);	
+	assertListEquals(context, ArrayUtils.FindMissingEntries(null, undefined), []);	
+	assertListEquals(context, ArrayUtils.FindMissingEntries([], undefined), []);	
+	assertListEquals(context, ArrayUtils.FindMissingEntries([], ["test"]), ["test"]);	
+	assertListEquals(context, ArrayUtils.FindMissingEntries(["test"], ["test"]), []);	
+	assertListEquals(context, ArrayUtils.FindMissingEntries(["test"], ["test", "Test"]), ["Test"]);	
 
 });	
 
@@ -8508,7 +8510,7 @@ suite.test("StringUtils.ParseStreamedJSON", async function (context) {
 	}
 });
 
-suite.test("ObjUtils.EnsureArrayUnique", async function (context) {
+suite.test("ArrayUtils.EnsureUnique", async function (context) {
 
 	let	tests = [
 		{
@@ -8532,7 +8534,7 @@ suite.test("ObjUtils.EnsureArrayUnique", async function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// simplify the array to get only unique
-		let	newArray = ObjUtils.EnsureArrayUnique(tests[i].values);
+		let	newArray = ArrayUtils.EnsureUnique(tests[i].values);
 
 		// compare the arrays
 		assertListEquals(context, newArray, tests[i].result);
@@ -8717,7 +8719,7 @@ suite.test("ObjUtils.SetValue", async function (context) {
 
 	// init
 	obj = ObjUtils.SetValue(obj, "matches", null, true, true);
-	context.assertEquals(ObjUtils.IsArray(obj.matches), true);
+	context.assertEquals(CoreUtils.IsArray(obj.matches), true);
 	context.assertEquals(obj.matches.length, 0);
 
 	// set an element text

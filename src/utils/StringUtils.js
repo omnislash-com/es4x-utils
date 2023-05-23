@@ -1,5 +1,7 @@
 const	rs = require('jsrsasign');
 
+const { CoreUtils } = require("../utils/CoreUtils");
+
 class	StringUtils
 {
 	static	get	ARRAY_ACTION_NEW()			{ return "new"; }	
@@ -161,7 +163,7 @@ class	StringUtils
 
 	static	ReplaceAll(_str, _toSearch, _toReplace)
 	{
-		if (StringUtils.IsString(_str) == false)
+		if (CoreUtils.IsString(_str) == false)
 			return _str;
 
 		// escape the search
@@ -181,22 +183,13 @@ class	StringUtils
 		return _str;
 	}
 
-	static	ToNumber(_str)
-	{
-		let	value = Number(_str);
-		if (isNaN(value) == true)
-			return 0;
-		else
-			return value;
-	}
-
 	static	ToInt(_str)
 	{
 		let	value = 0;
-		if (StringUtils.IsString(_str) == true)
+		if (CoreUtils.IsString(_str) == true)
 			value = Math.round(parseFloat(_str));
 		else
-			value = Math.round(StringUtils.ToNumber(_str));
+			value = Math.round(CoreUtils.ToNumber(_str));
 
 		if (isNaN(value) == true)
 			value = 0;
@@ -206,10 +199,10 @@ class	StringUtils
 	static	ToFloat(_str)
 	{
 		let	value = 0;
-		if (StringUtils.IsString(_str) == true)
+		if (CoreUtils.IsString(_str) == true)
 			value = parseFloat(_str);
 		else
-			value = StringUtils.ToNumber(_str);
+			value = CoreUtils.ToNumber(_str);
 
 		if (isNaN(value) == true)
 			value = 0;
@@ -219,7 +212,7 @@ class	StringUtils
 	static	ToJSON(_str, _returnNullIfError = false, _doReplace = true, _escapeLineBreaks = false)
 	{
 		// not a string?
-		if (StringUtils.IsString(_str) == false)
+		if (CoreUtils.IsString(_str) == false)
 			return _returnNullIfError ? null : _str;
 
 		// replace the \\\" by \"
@@ -248,7 +241,7 @@ class	StringUtils
 		if (_str == null)
 			return false;
 
-		if (StringUtils.IsString(_str) == true)
+		if (CoreUtils.IsString(_str) == true)
 		{
 			if (StringUtils.IsEmpty(_str) == true)	
 				return false;
@@ -267,14 +260,6 @@ class	StringUtils
 		}
 		else
 			return _str;
-	}
-
-	static	IsString(_str)
-	{
-		if (typeof _str === 'string' || _str instanceof String)
-			return true;
-		else
-			return false;
 	}
 
 	static	IsNumber(_str)
@@ -535,7 +520,7 @@ class	StringUtils
 
 	static	Split(_str, _delimiter = ",", _castToAny = true, _skipEmpty = false, _returnEmpty = false)
 	{
-		if (StringUtils.IsString(_str) == false)
+		if (CoreUtils.IsString(_str) == false)
 			return [_str];
 		
 		if (StringUtils.IsEmpty(_str) == true)

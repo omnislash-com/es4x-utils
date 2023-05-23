@@ -1,5 +1,7 @@
-import { ObjUtils } from '../utils/ObjUtils';
-import { StringUtils } from '../utils/StringUtils';
+const { CoreUtils } = require("../utils/CoreUtils");
+const { ObjUtils } = require("../utils/ObjUtils");
+const { StringUtils } = require("../utils/StringUtils");
+const { ArrayUtils } = require("../utils/ArrayUtils");
 
 class	JsonProcessorMethodParam
 {
@@ -101,19 +103,19 @@ class	JsonProcessorMethodParam
 			return JsonProcessorMethodParam.TYPE_ANY;
 
 		// object?
-		if (ObjUtils.IsObject(_value) == true)
+		if (CoreUtils.IsObject(_value) == true)
 			return JsonProcessorMethodParam.TYPE_OBJECT;
 
 		// list?
-		if (ObjUtils.IsArray(_value) == true)
+		if (CoreUtils.IsArray(_value) == true)
 			return JsonProcessorMethodParam.TYPE_LIST;
 
 		// string?
-		if (StringUtils.IsString(_value) == true)
+		if (CoreUtils.IsString(_value) == true)
 			return JsonProcessorMethodParam.TYPE_STRING;
 
 		// number?
-		if (ObjUtils.IsNumber(_value) == true)
+		if (CoreUtils.IsNumber(_value) == true)
 			return JsonProcessorMethodParam.TYPE_NUMBER;
 
 		// boolean?

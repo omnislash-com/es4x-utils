@@ -1,5 +1,5 @@
-import { ObjUtils } from './ObjUtils';
-import { StringUtils } from './StringUtils';
+const { StringUtils } = require("./StringUtils");
+const { LogUtils } = require("../utils/LogUtils");
 
 
 class	FileUtils
@@ -21,13 +21,13 @@ class	FileUtils
 				return buffer.toString();
 			else
 			{
-				ObjUtils.LogError("Error reading file at '" + _filePath + "'");
+				LogUtils.LogError("Error reading file at '" + _filePath + "'");
 				return "";
 			}
 		}
 		else
 		{
-			ObjUtils.LogError("File '" + _filePath + "' doesn't exist");
+			LogUtils.LogError("File '" + _filePath + "' doesn't exist");
 			return "";
 		}
 	}	

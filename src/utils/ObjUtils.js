@@ -1,4 +1,7 @@
+const { CoreUtils } = require("./CoreUtils");
+const { ArrayUtils } = require("./ArrayUtils");
 const { StringUtils } = require("./StringUtils");
+const { MathUtils } = require("./MathUtils");
 
 class	ObjUtils
 {
@@ -106,7 +109,7 @@ class	ObjUtils
 
 		// do we need to copy all
 		if (copyAll == true)
-			return ObjUtils.Copy(_obj);
+			return CoreUtils.Copy(_obj);
 		
 		// do key per key
 		for(let key of _fieldsToKeepList)
@@ -151,7 +154,7 @@ class	ObjUtils
 
 	static	GetValueToNumber(_obj, _path, _default=0)
 	{
-		return StringUtils.ToNumber(ObjUtils.GetValue(_obj, _path, _default));
+		return CoreUtils.ToNumber(ObjUtils.GetValue(_obj, _path, _default));
 	}
 
 	static	GetValueToFloat(_obj, _path, _default=0)
@@ -166,7 +169,7 @@ class	ObjUtils
 			return _obj;
 
 		// is the object an array?
-		if (ObjUtils.IsArray(_obj) == true)
+		if (CoreUtils.IsArray(_obj) == true)
 		{
 			for(let i=0; i<_obj.length; i++)
 			{
@@ -201,11 +204,11 @@ class	ObjUtils
 		}
 
 		// ensure sub object is an object
-		if (ObjUtils.IsValid(subObject) == false)
+		if (CoreUtils.IsValid(subObject) == false)
 			subObject = {};
 
 		// if it's not an object, we exit
-		if (ObjUtils.IsObject(subObject) == false)
+		if (CoreUtils.IsObject(subObject) == false)
 			return _obj;
 
 		// are we editing an array?
@@ -216,7 +219,7 @@ class	ObjUtils
 			let	arrayToSet = ObjUtils.GetValue(subObject, arrayPathInfo.path, []);
 
 			// if it's a proper array
-			if (ObjUtils.IsArray(arrayToSet) == true)
+			if (CoreUtils.IsArray(arrayToSet) == true)
 			{
 				// get the index
 				let	indexToUse = arrayPathInfo.index;
@@ -242,14 +245,14 @@ class	ObjUtils
 				// initialize the array
 				if (ObjUtils.HasProperty(subObject, fieldToEdit) == false)
 					subObject[fieldToEdit] = [];
-				if (ObjUtils.IsNull(subObject[fieldToEdit]) == true)
+				if (CoreUtils.IsNull(subObject[fieldToEdit]) == true)
 					subObject[fieldToEdit] = [];
 
 				// if it's an array and the value is not null
-				if ( (ObjUtils.IsArray(subObject[fieldToEdit]) == true) && (ObjUtils.IsNull(_value) == false) )
+				if ( (CoreUtils.IsArray(subObject[fieldToEdit]) == true) && (CoreUtils.IsNull(_value) == false) )
 				{
 					// if it's an array
-					if (ObjUtils.IsArray(_value) == true)
+					if (CoreUtils.IsArray(_value) == true)
 					{
 						subObject[fieldToEdit] = subObject[fieldToEdit].concat(_value);
 					}
@@ -273,45 +276,25 @@ class	ObjUtils
 			return subObject;
 	}
 
-	static	IsNull(_obj)
-	{
-		if (typeof _obj === 'undefined')
-			return true;
-		if (_obj == null)		
-			return true;
-		return false;
-	}
-
-	static	ToString(_obj)
-	{
-		if (ObjUtils.IsNull(_obj) == true)
-			return "";
-
-		if ( (ObjUtils.IsObject(_obj) == true) || (ObjUtils.IsArray(_obj) == true) )
-			return JSON.stringify(_obj);
-		else
-			return _obj.toString();
-	}
-
 	static	GetValueToString(_obj, _path, _default = "")
 	{
 		// get the value
 		let	value = ObjUtils.GetValue(_obj, _path, _default);
 
 		// cast it to string
-		return ObjUtils.ToString(value);
+		return CoreUtils.ToString(value);
 	}
 
 	static	GetValue(_obj, _path, _default = null)
 	{
 		// object is valid and we have a key?
-		if ( (ObjUtils.IsValid(_obj) == true) && (_path != "") )
+		if ( (CoreUtils.IsValid(_obj) == true) && (_path != "") )
 		{
 			// make sure we have a string
 			_path = _path.toString();
 
 			// is this an array?
-			if (ObjUtils.IsArray(_obj) == true)
+			if (CoreUtils.IsArray(_obj) == true)
 			{
 				// does it start with the index?
 				if (_path.startsWith("[") == true)
@@ -356,7 +339,7 @@ class	ObjUtils
 						if (valueBuf != null)
 						{
 							// if the returned value is an array, we concat
-							if (ObjUtils.IsArray(valueBuf) == true)
+							if (CoreUtils.IsArray(valueBuf) == true)
 							{
 								combinedArray = combinedArray.concat(valueBuf);
 							}
@@ -397,7 +380,7 @@ class	ObjUtils
 				if (ObjUtils.HasProperty(_obj, first_key) == true)
 				{
 					// last key and not valid?
-					if ( (keys.length == 0) && (ObjUtils.IsValid(_obj[first_key]) == false) )
+					if ( (keys.length == 0) && (CoreUtils.IsValid(_obj[first_key]) == false) )
 						return _default;
 	
 					// is it a value in the array?
@@ -458,7 +441,7 @@ class	ObjUtils
 		else if (StringUtils.IsEmpty(arrayPathInfo.action) == false)
 		{
 			// if it's empty we don't have anything
-			if (ObjUtils.IsArrayEmpty(list) == true)
+			if (ArrayUtils.IsEmpty(list) == true)
 				notFound = true;
 
 			// FIRST?
@@ -493,7 +476,7 @@ class	ObjUtils
 		let	newObject = {};
 
 		// object is valid?
-		if (ObjUtils.IsValid(_obj) == true)
+		if (CoreUtils.IsValid(_obj) == true)
 		{
 			// for each key in the object
 			for(const key in _obj)
@@ -502,7 +485,7 @@ class	ObjUtils
 				let	value = _obj[key];
 
 				// is it an object?
-				if (ObjUtils.IsObject(value) == true)
+				if (CoreUtils.IsObject(value) == true)
 				{
 					// flatten that object
 					let	subObject = ObjUtils.Flatten(value, _convertToString, _flattenArray);
@@ -515,7 +498,7 @@ class	ObjUtils
 					}
 				}
 				// is it an array?
-				else if (ObjUtils.IsArray(value) == true)
+				else if (CoreUtils.IsArray(value) == true)
 				{
 					// are we flattening the array?
 					if (_flattenArray == true)
@@ -538,7 +521,7 @@ class	ObjUtils
 					{
 						// are we converting to string?
 						if (_convertToString == true)
-							value = ObjUtils.ConvertToString(value);
+							value = CoreUtils.ToString(value);
 
 						newObject[_prefix + key] = value;
 					}
@@ -548,7 +531,7 @@ class	ObjUtils
 				{
 					// are we converting to string?
 					if (_convertToString == true)
-						value = ObjUtils.ConvertToString(value);
+						value = CoreUtils.ToString(value);
 					
 					newObject[_prefix + key] = value;
 				}
@@ -556,23 +539,6 @@ class	ObjUtils
 		}
 
 		return newObject;
-	}
-
-	static	ConvertToString(_obj)
-	{
-		// is it valid?
-		if (ObjUtils.IsValid(_obj) == true)
-		{
-			// is it an object or an array?
-			if ( (ObjUtils.IsObject(_obj) == true) || (ObjUtils.IsArray(_obj) == true) )
-			{
-				return JSON.stringify(_obj);
-			}
-			else
-				return String(_obj);
-		}
-		else
-			return "";
 	}
 
 	static	ConvertToFieldValueList(_obj)
@@ -599,28 +565,10 @@ class	ObjUtils
 
 		// now we sort
 		let	fieldToSort = _sortOrder + "value";
-		let	sortedList = ObjUtils.SortArray(newList, [fieldToSort]);
+		let	sortedList = ArrayUtils.Sort(newList, [fieldToSort]);
 
 		// return it
 		return sortedList;
-	}
-
-	static	IsArray(_obj)
-	{
-		return Array.isArray(_obj);
-	}
-
-	static	IsObject(_obj)
-	{
-		if (ObjUtils.IsValid(_obj) == true)
-			return _obj.constructor == Object
-		else
-			return false;
-	}
-
-	static	ConsoleInspect(_obj)
-	{
-		ObjUtils.Log("Inspect object", {"obj": Object.entries(_obj)});
 	}
 
 	static	RemoveAttributes(_obj, _attributes)
@@ -635,9 +583,9 @@ class	ObjUtils
 
 	static	Merge(_obj, _additionalFieldsObj, _overwrite = true)
 	{
-		if (ObjUtils.IsValid(_obj) == false)
+		if (CoreUtils.IsValid(_obj) == false)
 			_obj = {};
-		if (ObjUtils.IsValid(_additionalFieldsObj) == false)
+		if (CoreUtils.IsValid(_additionalFieldsObj) == false)
 			return _obj;
 
 		// loop for the fields and set them
@@ -655,19 +603,10 @@ class	ObjUtils
 
 		return _obj;
 	}
-	
-	static	IsValid(_obj)
-	{
-		if (typeof _obj === 'undefined')
-			return false;
-		if (_obj == null)
-			return false;
-		return true;
-	}
 
 	static	HasProperty(_obj, _key)
 	{
-		return ObjUtils.IsValid(_obj[_key]);
+		return CoreUtils.IsValid(_obj[_key]);
 	}
 
 	static	HasKeys(_obj)
@@ -677,14 +616,14 @@ class	ObjUtils
 
 	static	Keys(_obj)
 	{
-		if (ObjUtils.IsValid(_obj) == false)
+		if (CoreUtils.IsValid(_obj) == false)
 			return [];
 		return Object.keys(_obj);
 	}
 
 	static	CountKeys(_obj)
 	{
-		if (ObjUtils.IsValid(_obj) == false)
+		if (CoreUtils.IsValid(_obj) == false)
 			return 0;
 		return Object.keys(_obj).length;
 	}
@@ -693,44 +632,11 @@ class	ObjUtils
 	{
 		if (ObjUtils.HasProperty(_obj, _arrayKey) == true)
 		{
-			_obj[_arrayKey] = ObjUtils.SortArray(_obj[_arrayKey], _sortByFields);
+			_obj[_arrayKey] = ArrayUtils.Sort(_obj[_arrayKey], _sortByFields);
 		}
 
 		return _obj;
 	}	
-
-	static	SortArray(_array, _sortByFields)
-	{
-		// no fields?
-		if (_sortByFields.length == 0)
-			return _array;
-		
-		return _array.sort(function(a, b) {
-
-			let diff = 0;
-			for(let i=0; i<_sortByFields.length; i++)
-			{
-				// different? we return
-				let fieldToCheck = _sortByFields[i];
-
-				// type of search ascending?
-				if (fieldToCheck.startsWith('-') == true)
-				{
-					fieldToCheck = fieldToCheck.substr(1);
-					diff = parseFloat(a[fieldToCheck]) - parseFloat(b[fieldToCheck]);
-				}
-				else
-				{
-					diff = parseFloat(b[fieldToCheck]) - parseFloat(a[fieldToCheck]);
-				}
-
-				if (diff != 0)
-					break;
-			}
-
-			return diff;
-		});
-	}
 
 	static	DuplicateListInObject(_obj, _arrayKey, _newArrayKey)
 	{
@@ -748,7 +654,7 @@ class	ObjUtils
 	static	ToArrayOfField(_arrayOfObjects, _field)
 	{
 		let	finalArray = [];
-		if (ObjUtils.IsArray(_arrayOfObjects) == true)
+		if (CoreUtils.IsArray(_arrayOfObjects) == true)
 		{
 			for(let i=0; i<_arrayOfObjects.length; i++)
 			{
@@ -813,7 +719,7 @@ class	ObjUtils
 
 	static	BuildListOfObjectsFromIdAndDict(_ids, _dict)
 	{
-		if (ObjUtils.IsArray(_ids) == false)
+		if (CoreUtils.IsArray(_ids) == false)
 			return [];
 		if (_ids.length == 0)
 			return [];
@@ -838,7 +744,7 @@ class	ObjUtils
 			return values;
 
 		// are we an array?
-		if (ObjUtils.IsArray(_obj) == true)
+		if (CoreUtils.IsArray(_obj) == true)
 		{
 			for(let i=0; i<_obj.length; i++)
 			{
@@ -846,22 +752,22 @@ class	ObjUtils
 				let	subValues = ObjUtils.GetValueRecursive(_obj[i], _field, _depthMax - 1, _objKeys);
 
 				// insert them in ours
-				values = ObjUtils.MergeArraysUnique(values, subValues);				
+				values = ArrayUtils.MergeUnique(values, subValues);				
 			}
 		}
 		// are we an object?
-		else if (ObjUtils.IsObject(_obj) == true)
+		else if (CoreUtils.IsObject(_obj) == true)
 		{
 			for(const key in _obj)
 			{
 				// is it another object? If yes, we go in it
-				if ( (ObjUtils.IsObject(_obj[key]) == true) || (ObjUtils.IsArray(_obj[key]) == true) )
+				if ( (CoreUtils.IsObject(_obj[key]) == true) || (CoreUtils.IsArray(_obj[key]) == true) )
 				{
 					// we are going to see inside if the the object has the key
 					let	goInside = true;
 					if (_objKeys.length > 0)
 					{
-						if ( (ObjUtils.IsObject(_obj[key]) == true) && (_objKeys.includes(key) == false) )
+						if ( (CoreUtils.IsObject(_obj[key]) == true) && (_objKeys.includes(key) == false) )
 							goInside = false;
 					}
 
@@ -871,7 +777,7 @@ class	ObjUtils
 						let	subValues = ObjUtils.GetValueRecursive(_obj[key], _field, _depthMax - 1, _objKeys);
 
 						// insert them in ours
-						values = ObjUtils.MergeArraysUnique(values, subValues);
+						values = ArrayUtils.MergeUnique(values, subValues);
 					}
 				}
 				else
@@ -897,7 +803,7 @@ class	ObjUtils
 			return _obj;
 
 		// are we an array?
-		if (ObjUtils.IsArray(_obj) == true)
+		if (CoreUtils.IsArray(_obj) == true)
 		{
 			for(let i=0; i<_obj.length; i++)
 			{
@@ -905,12 +811,12 @@ class	ObjUtils
 			}
 		}
 		// are we an object?
-		else if (ObjUtils.IsObject(_obj) == true)
+		else if (CoreUtils.IsObject(_obj) == true)
 		{
 			for(const key in _obj)
 			{
 				// is it another object? If yes, we go in it
-				if ( (ObjUtils.IsObject(_obj[key]) == true) || (ObjUtils.IsArray(_obj[key]) == true) )
+				if ( (CoreUtils.IsObject(_obj[key]) == true) || (CoreUtils.IsArray(_obj[key]) == true) )
 				{
 					_obj[key] = ObjUtils.ReplaceValueRecursive(_obj[key], _field, _replaceDict, _targetField, _default, _depthMax - 1);
 				}
@@ -940,27 +846,6 @@ class	ObjUtils
 		return _obj;
 	}
 
-	static	MergeArraysUnique(_array1, _array2)
-	{
-		for(let i=0; i<_array2.length; i++)
-		{
-			if (_array1.includes(_array2[i]) == false)
-				_array1.push(_array2[i]);
-		}
-		return _array1;
-	}
-
-	static	EnsureArrayUnique(_array)
-	{
-		let	finalArray = [];
-		for(let item of _array)
-		{
-			if (finalArray.includes(item) == false)
-				finalArray.push(item);
-		}
-		return finalArray;
-	}
-
 	static	EnsureStringsNotNull(_obj, _keys)
 	{
 		for(let i=0; i<_keys.length; i++)
@@ -977,7 +862,6 @@ class	ObjUtils
 
 		return _obj;
 	}
-
 
 	static	SubstituteValuesInString(_str, _obj, _objIsArray = false)
 	{
@@ -1020,7 +904,7 @@ class	ObjUtils
 		let	newObject = {};
 
 		// nothing to extract?
-		if (ObjUtils.IsObject(_fieldsToExtract) == false)
+		if (CoreUtils.IsObject(_fieldsToExtract) == false)
 			return newObject;
 
 		// process each field
@@ -1030,7 +914,7 @@ class	ObjUtils
 			let	value = ObjUtils.GetValue(_obj, key, "");
 
 			// convert it to string
-			value = ObjUtils.ConvertToString(value);
+			value = CoreUtils.ToString(value);
 
 			// set it
 			newObject[_fieldsToExtract[key]] = value;
@@ -1206,28 +1090,18 @@ class	ObjUtils
 		return finalList;			
 	}
 
-	static	IsBool(_obj)
-	{
-		return (_obj === true || _obj === false);
-	}
-
-	static	IsNumber(_obj)
-	{
-		return Number.isFinite(_obj);
-	}
-
 	static	CompareValues(_comparison, _value1, _value2, _forceString = false)
 	{
-		if (ObjUtils.IsValid(_value1) == false)
+		if (CoreUtils.IsValid(_value1) == false)
 			_value1 = "";
-		if (ObjUtils.IsValid(_value2) == false)
+		if (CoreUtils.IsValid(_value2) == false)
 			_value2 = "";
 
 		// one of them is a number?
-		if ( ((ObjUtils.IsNumber(_value1) == true) || (ObjUtils.IsNumber(_value2) == true)) && (_forceString == false) )
+		if ( ((CoreUtils.IsNumber(_value1) == true) || (CoreUtils.IsNumber(_value2) == true)) && (_forceString == false) )
 		{
-			_value1 = StringUtils.ToNumber(_value1);
-			_value2 = StringUtils.ToNumber(_value2);
+			_value1 = CoreUtils.ToNumber(_value1);
+			_value2 = CoreUtils.ToNumber(_value2);
 		}
 		else
 		{
@@ -1256,7 +1130,7 @@ class	ObjUtils
 		else
 		{
 			// STRING? €
-			if ( (StringUtils.IsString(_value1) == true) && (StringUtils.IsString(_value2) == true) )
+			if ( (CoreUtils.IsString(_value1) == true) && (CoreUtils.IsString(_value2) == true) )
 			{
 				// CONTAINS
 				if (_comparison == "€")
@@ -1384,7 +1258,7 @@ class	ObjUtils
 	static	FindFirst(_list, _conditionField, _conditionValue, _conditionComparison = "==", _default = null, _returnIndex = false)
 	{
 		// not an array?
-		if (ObjUtils.IsArrayEmpty(_list) == false)
+		if (ArrayUtils.IsEmpty(_list) == false)
 		{
 			// extract the conditions
 			let	conditions = ObjUtils.ExtractConditions(_conditionField, _conditionValue, _conditionComparison);
@@ -1497,33 +1371,6 @@ class	ObjUtils
 		return finalObject;
 	}
 
-	static	IsBoolAlike(_obj)
-	{
-		if (ObjUtils.IsBool(_obj) == true)
-			return true;
-		else if (StringUtils.IsString(_obj) == true)
-		{
-			if ( (_obj.toLowerCase() == "true") || (_obj.toLowerCase() == "false") )
-				return true;
-		}
-
-		return false;
-	}
-
-	static	IsNumberAlike(_obj)
-	{
-		if (ObjUtils.IsNumber(_obj) == true)
-			return true;
-		else if (StringUtils.IsString(_obj) == true)
-		{
-			let	number = StringUtils.ToNumber(_obj);
-			if (number.toString() == _obj)
-				return true;
-		}
-
-		return false;
-	}	
-
 	static	MergeObjectsFromKeys(_object, _objectToAdd, _keysToKeep, _convertBoolToInt = true)
 	{
 		let	newObject = {};
@@ -1566,7 +1413,7 @@ class	ObjUtils
 				let	otherValue = ObjUtils.GetValue(_objectToAdd, keySrc, "");
 
 				// convert it to string
-				otherValue = ObjUtils.ToString(otherValue);
+				otherValue = CoreUtils.ToString(otherValue);
 
 				// if it's not empty
 				if (StringUtils.IsEmpty(otherValue) == false)
@@ -1594,7 +1441,7 @@ class	ObjUtils
 				if (ourValue != null)
 				{
 					// is it an array?
-					if (ObjUtils.IsArray(ourValue) == true)
+					if (CoreUtils.IsArray(ourValue) == true)
 						finalValue = ourValue;
 					else
 						finalValue.push(ourValue);
@@ -1607,7 +1454,7 @@ class	ObjUtils
 				if (otherValue != null)
 				{
 					// is it an array?
-					if (ObjUtils.IsArray(otherValue) == true)
+					if (CoreUtils.IsArray(otherValue) == true)
 						finalValue = finalValue.concat(otherValue);
 					else
 						finalValue.push(otherValue);
@@ -1643,7 +1490,7 @@ class	ObjUtils
 		{
 			// is the key a number?
 			// boolean?
-			if ( (ObjUtils.IsBoolAlike(_value) == true) && (_convertBoolToInt == true) )
+			if ( (CoreUtils.IsBoolAlike(_value) == true) && (_convertBoolToInt == true) )
 			{
 				// initialize it to 0 or 1
 				newValue = StringUtils.ToBool(_value) ? 1 : 0;
@@ -1652,16 +1499,16 @@ class	ObjUtils
 				newValue += StringUtils.ToBool(_valueOther) ? 1 : 0;
 			}
 			// number?
-			else if (ObjUtils.IsNumberAlike(_value) == true)
+			else if (CoreUtils.IsNumberAlike(_value) == true)
 			{
 				// sum it
-				newValue = StringUtils.ToNumber(_value) + StringUtils.ToNumber(_valueOther);
+				newValue = CoreUtils.ToNumber(_value) + CoreUtils.ToNumber(_valueOther);
 			}
 			// array?
-			else if (ObjUtils.IsArray(_value) == true)
+			else if (CoreUtils.IsArray(_value) == true)
 			{
 				// is the other one an array too?
-				if (ObjUtils.IsArray(_valueOther) == true)
+				if (CoreUtils.IsArray(_valueOther) == true)
 				{
 					newValue = _value.concat(_valueOther);
 				}
@@ -1671,14 +1518,14 @@ class	ObjUtils
 		else if (_valueOther != null)
 		{
 			// is it a bool?
-			if ( (ObjUtils.IsBoolAlike(_valueOther) == true) && (_convertBoolToInt == true) )
+			if ( (CoreUtils.IsBoolAlike(_valueOther) == true) && (_convertBoolToInt == true) )
 			{
 				newValue = StringUtils.ToBool(_valueOther) ? 1 : 0;
 			}
 			// is it a number?
-			else if (ObjUtils.IsNumberAlike(_valueOther) == true)
+			else if (CoreUtils.IsNumberAlike(_valueOther) == true)
 			{
-				newValue = StringUtils.ToNumber(_valueOther);
+				newValue = CoreUtils.ToNumber(_valueOther);
 			}
 			else if (_valueOther != null)
 			{
@@ -1696,7 +1543,7 @@ class	ObjUtils
 	static	MergeObjects(_object, _objectToAdd, _keysToKeep = null, _convertBoolToInt = true)
 	{
 		// do we have keys?
-		if (ObjUtils.IsArrayEmpty(_keysToKeep) == false)
+		if (ArrayUtils.IsEmpty(_keysToKeep) == false)
 			return ObjUtils.MergeObjectsFromKeys(_object, _objectToAdd, _keysToKeep, _convertBoolToInt);
 
 		let	newObject = {};
@@ -1722,75 +1569,14 @@ class	ObjUtils
 		return newObject;
 	}
 
-	static	ReformatJSON(_json)
-	{
-		// try to parse the string to JSON
-		try
-		{
-			let	str = JSON.stringify(_json);
-			return JSON.parse(str);
-		}
-		catch
-		{
-			ObjUtils.LogError("Error reformating JSON");
-			return {};
-		}			
-	}
-
-	static	IsArrayEmpty(_array)
-	{
-		// is it an array?
-		if (ObjUtils.IsArray(_array) == true)
-			return _array.length == 0;
-		else
-			return true;
-	}
-
-	static	RoundNumber(_value, _decimals = 0)
-	{
-		if (_decimals == 0)
-			return Math.round(_value);
-		
-		// calculate our divider
-		let	divider = 10;
-		for(let i=1; i<_decimals; i++)
-			divider = divider * 10;
-			
-		// calculate it
-		return Math.round(_value*divider)/divider;
-	}
-
-	static	CompareArrays(_array1, _array2)
-	{
-		// different size?
-		if (_array1.length != _array2.length)
-			return false;
-		
-		// they are the same size, all elements in the first one must be in the second one
-		for(let i=0; i<_array1.length; i++)
-		{
-			if (_array2.includes(_array1[i]) == false)
-				return false;
-		}
-
-		// vice versa
-		for(let i=0; i<_array2.length; i++)
-		{
-			if (_array1.includes(_array2[i]) == false)
-				return false;
-		}
-
-		return true;
-	}
-
 	static	PrepareForAddSub(_obj, _avoidKey = false, _fieldKeyName = "key")
 	{
 		// nothing?
-		if (ObjUtils.IsValid(_obj) == false)
+		if (CoreUtils.IsValid(_obj) == false)
 			return null;
 		
 		// object?
-		if (ObjUtils.IsObject(_obj) == true)
+		if (CoreUtils.IsObject(_obj) == true)
 		{
 			let	newObj = {};
 			for(const key in _obj)
@@ -1804,7 +1590,7 @@ class	ObjUtils
 			return newObj;
 		}
 		// array?
-		else if (ObjUtils.IsArray(_obj) == true)
+		else if (CoreUtils.IsArray(_obj) == true)
 		{
 			// create a new array
 			let	result = [];
@@ -1815,19 +1601,19 @@ class	ObjUtils
 			return result;
 		}
 		// string?
-		else if (StringUtils.IsString(_obj) == true)
+		else if (CoreUtils.IsString(_obj) == true)
 		{
 			let	newObj = {};
 			newObj[_obj] = 1;
 			return newObj;
 		}
 		// bool?
-		else if (ObjUtils.IsBool(_obj) == true)
+		else if (CoreUtils.IsBool(_obj) == true)
 		{
 			return _obj ? 1 : 0;
 		}
 		// number?
-		else if (ObjUtils.IsNumber(_obj) == true)
+		else if (CoreUtils.IsNumber(_obj) == true)
 		{
 			return _obj;
 		}
@@ -1839,20 +1625,20 @@ class	ObjUtils
 	{
 		// nothing?
 		let	newObj = {};
-		if (ObjUtils.IsValid(_obj) == true)
+		if (CoreUtils.IsValid(_obj) == true)
 		{
 			for(const key in _obj)
 				newObj[key] = _obj[key];
 		}
 
 		// other one not empty?
-		if (ObjUtils.IsObject(_objToAdd) == true)
+		if (CoreUtils.IsObject(_objToAdd) == true)
 		{
 			// we're going to add all the keys from the other object
 			for(const key in _objToAdd)
 			{
 				// is it an object?
-				if (ObjUtils.IsObject(_objToAdd[key]) == true)
+				if (CoreUtils.IsObject(_objToAdd[key]) == true)
 				{
 					// get our object
 					let	ourObj = ObjUtils.GetValue(_obj, key, {});
@@ -1861,14 +1647,14 @@ class	ObjUtils
 					newObj[key] = ObjUtils.AddSub(ourObj, _objToAdd[key], _operation, _fieldKeyName);
 				}
 				// number?
-				else if (ObjUtils.IsNumber(_objToAdd[key]) == true)
+				else if (CoreUtils.IsNumber(_objToAdd[key]) == true)
 				{
 					// get our value
 					let	ourValue = ObjUtils.GetValue(_obj, key, 0);
 
 					// is this a string?
-					if (StringUtils.IsString(ourValue) == true)
-						ourValue = StringUtils.ToNumber(ourValue);
+					if (CoreUtils.IsString(ourValue) == true)
+						ourValue = CoreUtils.ToNumber(ourValue);
 	
 					// do the operation
 					// SUB
@@ -1882,7 +1668,7 @@ class	ObjUtils
 					newObj[key] = ourValue;					
 				}
 				// array?
-				else if (ObjUtils.IsArray(_objToAdd[key]) == true)
+				else if (CoreUtils.IsArray(_objToAdd[key]) == true)
 				{
 					// make sure we have an array there
 					if (newObj.hasOwnProperty(key) == false)
@@ -1892,7 +1678,7 @@ class	ObjUtils
 					for(let i=0; i<_objToAdd[key].length; i++)
 					{
 						// is it an object?
-						if (ObjUtils.IsObject(_objToAdd[key][i]) == true)
+						if (CoreUtils.IsObject(_objToAdd[key][i]) == true)
 						{
 							// we need to find the key
 							let	entryKey = ObjUtils.GetValue(_objToAdd[key][i], _fieldKeyName, "");
@@ -1903,7 +1689,7 @@ class	ObjUtils
 								for(let j=0; j<newObj[key].length; j++)
 								{
 									// is it an object?
-									if (ObjUtils.IsObject(newObj[key][j]) == true)
+									if (CoreUtils.IsObject(newObj[key][j]) == true)
 									{
 										// get the key
 										let	keyBuf = ObjUtils.GetValue(newObj[key][j], _fieldKeyName, "");
@@ -1939,19 +1725,19 @@ class	ObjUtils
 
 	static	IsAddSubEmpty(_obj)
 	{
-		if (ObjUtils.IsValid(_obj) == true)
+		if (CoreUtils.IsValid(_obj) == true)
 		{
 			for(const key in _obj)
 			{
 				// object?
-				if (ObjUtils.IsObject(_obj[key]) == true)
+				if (CoreUtils.IsObject(_obj[key]) == true)
 				{
 					let	isEmpty = ObjUtils.IsAddSubEmpty(_obj[key]);
 					if (isEmpty == false)
 						return false;
 				}
 				// number?
-				else if (ObjUtils.IsNumber(_obj[key]) == true)
+				else if (CoreUtils.IsNumber(_obj[key]) == true)
 				{
 					if (_obj[key] != 0)
 						return false;
@@ -1971,7 +1757,7 @@ class	ObjUtils
 		for(const key in _obj)
 		{
 			// is it a number?
-			if (ObjUtils.IsNumber(_obj[key]) == true)
+			if (CoreUtils.IsNumber(_obj[key]) == true)
 			{
 				// is it higher or better?
 				if ( (isSet == false) || (_obj[key] > value) )
@@ -1994,7 +1780,7 @@ class	ObjUtils
 		for(const key in _obj)
 		{
 			// is it a number?
-			if (ObjUtils.IsNumber(_obj[key]) == true)
+			if (CoreUtils.IsNumber(_obj[key]) == true)
 			{
 				// is it higher or better?
 				if ( (isSet == false) || (_obj[key] < value) )
@@ -2016,7 +1802,7 @@ class	ObjUtils
 		for(const key in _obj)
 		{
 			// is it a number?
-			if (ObjUtils.IsNumber(_obj[key]) == true)
+			if (CoreUtils.IsNumber(_obj[key]) == true)
 			{
 				total += _obj[key];
 				nb++;
@@ -2029,19 +1815,14 @@ class	ObjUtils
 		return avg;
 	}
 
-	static	Copy(_obj)
-	{
-		return ObjUtils.ReformatJSON(_obj);
-	}
-
 	static	SumValuesInArray(_obj)
 	{
 		let	total = 0;
-		if (ObjUtils.IsArray(_obj) == true)
+		if (CoreUtils.IsArray(_obj) == true)
 		{
 			for(let i=0; i<_obj.length; i++)
 			{
-				if (ObjUtils.IsNumber(_obj[i]) == true)
+				if (CoreUtils.IsNumber(_obj[i]) == true)
 				{
 					total += _obj[i];
 				}
@@ -2053,7 +1834,7 @@ class	ObjUtils
 	static	SumValuesOfFieldInArray(_obj, _field)
 	{
 		let	total = 0;
-		if (ObjUtils.IsArray(_obj) == true)
+		if (CoreUtils.IsArray(_obj) == true)
 		{
 			for(let i=0; i<_obj.length; i++)
 			{
@@ -2061,7 +1842,7 @@ class	ObjUtils
 				let	value = ObjUtils.GetValue(_obj[i], _field, 0);
 
 				// is it a number?
-				if (ObjUtils.IsNumber(value) == true)
+				if (CoreUtils.IsNumber(value) == true)
 				{
 					total += value;
 				}
@@ -2070,86 +1851,11 @@ class	ObjUtils
 		return total;
 	}	
 
-	static	CreateLog(_message, _payload = null)
-	{
-		// if the payload is empty, we create one
-		let	finalPayload = {};
-		if (ObjUtils.IsValid(_payload) == false)
-			finalPayload = {};
-		else
-			finalPayload = ObjUtils.Copy(_payload);
-		
-		// if it's not an object, we create an object
-		if (ObjUtils.IsObject(_payload) == false)
-		{
-			finalPayload = {
-				data: _payload
-			};
-		}
-		// if it already has a "message" key, we wrapped with an object
-		else if (_payload.hasOwnProperty("message") == true)
-		{
-			finalPayload = {
-				data: _payload,
-			};
-		}
-
-		// add the message
-		finalPayload["message"] = _message;
-
-		return JSON.stringify(finalPayload);
-	}
-
-	static	Log(_message, _payload = null)
-	{
-		console.log(ObjUtils.CreateLog(_message, _payload));
-	}
-
-	static	LogWarning(_message, _payload = null, _model = "")
-	{
-		_message = "[WARNING] " + _message;
-		console.log(ObjUtils.CreateLog(_message, _payload));
-//		console.warn(ObjUtils.CreateLog(_message, _payload));
-	}
-
-	static	LogError(_message, _payload = null, _model = "")
-	{
-		_message = "[ERROR] " + _message;
-		console.log(ObjUtils.CreateLog(_message, _payload));
-//		console.error(ObjUtils.CreateLog(_message, _payload));
-	}
-
-	static	LogException(_e)
-	{
-		let	ourException = ObjUtils.ExtractException(_e);
-		ObjUtils.LogError("Exception: " + ourException.error_message, ourException);
-		if (_e)
-			console.trace(_e);
-	}
-
-	static	ExtractException(_e)
-	{
-		if (_e)
-		{
-			return {
-				error: "exception",
-				error_message: _e.toString()
-			};
-		}
-		else
-		{
-			return {
-				error: "exception",
-				error_message: "unknown"
-			};
-		}
-	}	
-
 	static	SimplifyList(_list, _fieldsToKeep)
 	{
 		let	newList = [];
 		
-		if (ObjUtils.IsArray(_list) == true)
+		if (CoreUtils.IsArray(_list) == true)
 		{
 			for(let i=0; i<_list.length; i++)
 			{
@@ -2165,97 +1871,11 @@ class	ObjUtils
 		return newList;
 	}
 
-	static	FillList(_count, _start=0, _step=1)
-	{
-		let	newList = [];
-		for(let i=0; i<_count; i++)
-		{
-			newList.push(_start + _step*i);
-		}
-		return newList;
-	}
-
-	static	ListToString(_list)
-	{
-		let	newList = [];
-
-		if (ObjUtils.IsArray(_list) == true)
-		{
-			for(let i=0; i<_list.length; i++)
-			{
-				newList.push(ObjUtils.ToString(_list[i]));
-			}
-		}
-
-		return newList;
-	}
-
-	static	InvertListValues(_list, _max)
-	{
-		let	newList = [];
-
-		if (ObjUtils.IsArray(_list) == true)
-		{
-			for(let i=0; i<_list.length; i++)
-			{
-				if (ObjUtils.IsNumber(_list[i]) == true)
-				{
-					newList.push(_max - _list[i]);
-				}
-				else
-				{
-					newList.push(_list[i]);
-				}
-			}
-		}
-
-		return newList;
-	}
-
-	static	FillListColor(_count, _color = "#FFFFFF")
-	{
-		let	colors = [];
-		let	currentOpacity = 100;
-		let	lowestOpacity = 20;
-		let	opacityStep = (currentOpacity - lowestOpacity) / (_count - 1);
-		for(let i=0; i<_count; i++)
-		{
-			// convert the opacity to HEXA
-			let	alpha = Math.round(currentOpacity / 100 * 255);
-			let	alphaHex = alpha.toString(16);
-			
-			// add it
-			colors.push(_color + alphaHex.toUpperCase());
-
-			// decrement
-			currentOpacity -= opacityStep;
-			if (currentOpacity < 0)
-				currentOpacity = 0;
-		}
-
-		return colors;
-	}
-
-	static	ReverseList(_list)
-	{
-		let	newList = [];
-
-		if (ObjUtils.IsArray(_list) == true)
-		{
-			for(let i=_list.length-1; i>=0; i--)
-			{
-				newList.push(_list[i]);
-			}
-		}
-
-		return newList;
-	}
-
 	static	ExtractFromList(_list, _field, _addIfEmpty = false)
 	{
 		let	newList = [];
 
-		if (ObjUtils.IsArray(_list) == true)
+		if (CoreUtils.IsArray(_list) == true)
 		{
 			for(let i=0; i<_list.length; i++)
 			{
@@ -2266,7 +1886,7 @@ class	ObjUtils
 				let	isEmpty = value == null;
 				if (isEmpty == false)
 				{
-					if (StringUtils.IsString(value) == true)
+					if (CoreUtils.IsString(value) == true)
 						isEmpty = StringUtils.IsEmpty(value);
 				}
 
@@ -2282,7 +1902,7 @@ class	ObjUtils
 	{
 		let	newList = [];
 
-		if (ObjUtils.IsArray(_list) == true)
+		if (CoreUtils.IsArray(_list) == true)
 		{
 			// foreach item
 			for(let i=0; i<_list.length; i++)
@@ -2312,7 +1932,7 @@ class	ObjUtils
 	{
 		let	newList = [];
 
-		if (ObjUtils.IsArray(_list) == true)
+		if (CoreUtils.IsArray(_list) == true)
 		{
 			for(let i=0; i<_list.length; i++)
 			{
@@ -2321,7 +1941,7 @@ class	ObjUtils
 				let	value2 = ObjUtils.GetValueToFloat(_list[i], _field2);
 
 				// do the operation
-				let	newValue = ObjUtils.DoCalculation(value1, value2, _calc);
+				let	newValue = MathUtils.DoCalculation(value1, value2, _calc);
 
 				// add it
 				newList.push(newValue);
@@ -2331,39 +1951,16 @@ class	ObjUtils
 		return newList;
 	}
 
-	static	DoCalculation(_value1, _value2, _calc = "+")
-	{
-		// ADD
-		if (_calc == "+")
-			return _value1 + _value2;
-		// SUB
-		else if (_calc == "-")
-			return _value1 - _value2;
-		// MUL
-		else if (_calc == "*")
-			return _value1 * _value2;
-		// DIV
-		else if (_calc == "/")
-		{
-			if (_value2 != 0)
-				return _value1 / _value2;
-			else
-				return 0;
-		}
-		else
-			return _value1 + _value2;
-	}
-
 	static	ReplaceAllIdsWithObjectInList(_itemsList, _field, _objectsDict, _keepAssoc)
 	{
 		let	newList = [];
 		for(let obj of _itemsList)
 		{
-			let	copyObj = ObjUtils.Copy(obj);
+			let	copyObj = CoreUtils.Copy(obj);
 
 			// get the list of ids
 			let	currentList = ObjUtils.GetValue(obj, _field);
-			if (ObjUtils.IsArray(currentList) == true)
+			if (CoreUtils.IsArray(currentList) == true)
 			{
 				// rebuild the list with the new values
 				let	finalList = _keepAssoc ? {} : [];
@@ -2391,28 +1988,11 @@ class	ObjUtils
 		return newList;		
 	}
 
-	static	FindMissingEntriesInArray(_array, _newArray)
-	{
-		// check the inputs
-		if (ObjUtils.IsArrayEmpty(_newArray) == true)
-			return [];
-		if (ObjUtils.IsArrayEmpty(_array) == true)
-			return _newArray;
-
-		let	missingEntries = [];
-		for(let entry of _newArray)
-		{
-			if (_array.includes(entry) == false)
-				missingEntries.push(entry);
-		}
-		return missingEntries;
-	}
-
 	static	ConvertObjectToList(_object)
 	{
-		if (ObjUtils.IsObject(_object) == true)
+		if (CoreUtils.IsObject(_object) == true)
 			return [_object];
-		else if (ObjUtils.IsArray(_object) == true)
+		else if (CoreUtils.IsArray(_object) == true)
 			return _object;
 		else
 			return [];
@@ -2617,7 +2197,7 @@ class	ObjUtils
 
 	static	SerializeObject(_obj, _delimiterField = "&", _delimiterValue = "=", _encodeComponents = true)
 	{
-		if (ObjUtils.IsValid(_obj) == false)
+		if (CoreUtils.IsValid(_obj) == false)
 			return "";
 
 		let	elements = [];
@@ -2627,7 +2207,7 @@ class	ObjUtils
 			let	encodedKey = _encodeComponents ? encodeURIComponent(key) : key;
 
 			// encode the value
-			let	value = ObjUtils.ToString(_obj[key]);
+			let	value = CoreUtils.ToString(_obj[key]);
 			let	encodedValue = _encodeComponents ? encodeURIComponent(value) : value;
 
 			elements.push(encodedKey + _delimiterValue + encodedValue);
@@ -2635,9 +2215,6 @@ class	ObjUtils
 
 		return elements.join(_delimiterField);
 	}
-
-
-
 };
 
 module.exports = {

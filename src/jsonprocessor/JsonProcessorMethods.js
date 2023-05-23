@@ -1,8 +1,11 @@
-import { ObjUtils } from '../utils/ObjUtils';
-import { StringUtils } from '../utils/StringUtils';
-import { DateUtils } from '../utils/DateUtils';
-import { MathUtils } from '../utils/MathUtils';
-import { JsonProcessorMethodParam } from './JsonProcessorMethodParam';
+const { LogUtils } = require("../utils/LogUtils");
+const { CoreUtils } = require("../utils/CoreUtils");
+const { ObjUtils } = require("../utils/ObjUtils");
+const { ArrayUtils } = require("../utils/ArrayUtils");
+const { StringUtils } = require("../utils/StringUtils");
+const { DateUtils } = require("../utils/DateUtils");
+const { MathUtils } = require("../utils/MathUtils");
+const { JsonProcessorMethodParam } = require("./JsonProcessorMethodParam");
 
 class	JsonProcessorMethods
 {
@@ -1171,7 +1174,7 @@ class	JsonProcessorMethods
 		}
 		else
 		{
-			ObjUtils.LogError("Parameters are incorrect for method: ", {
+			LogUtils.LogError("Parameters are incorrect for method: ", {
 				"method_info": _methodInfo,
 				"parameters": _parameters
 			});
@@ -1254,7 +1257,7 @@ class	JsonProcessorMethods
 			}
 			else
 			{
-				ObjUtils.LogError("Parameter '" + paramName + "' is incorrect: " + errorMsg);
+				LogUtils.LogError("Parameter '" + paramName + "' is incorrect: " + errorMsg);
 				nbErrors++;
 			}
 		}
@@ -1344,7 +1347,7 @@ class	JsonProcessorMethods
 	static	sort(_data)
 	{
 		let	sortByValues = _data["sort_by"].split("|");
-		let	sortedList = ObjUtils.SortArray(_data["list"], sortByValues);
+		let	sortedList = ArrayUtils.Sort(_data["list"], sortByValues);
 
 		return sortedList;
 	}	
@@ -1446,8 +1449,8 @@ class	JsonProcessorMethods
 	static	startsWith(_data)
 	{
 		// convert to strings
-		let	value = ObjUtils.ToString(_data["value"]).toLowerCase();
-		let	search = ObjUtils.ToString(_data["search"]).toLowerCase();
+		let	value = CoreUtils.ToString(_data["value"]).toLowerCase();
+		let	search = CoreUtils.ToString(_data["search"]).toLowerCase();
 
 		return ObjUtils.CompareValues("[>", value, search, true);
 	}
@@ -1455,8 +1458,8 @@ class	JsonProcessorMethods
 	static	endsWith(_data)
 	{
 		// convert to strings
-		let	value = ObjUtils.ToString(_data["value"]).toLowerCase();
-		let	search = ObjUtils.ToString(_data["search"]).toLowerCase();
+		let	value = CoreUtils.ToString(_data["value"]).toLowerCase();
+		let	search = CoreUtils.ToString(_data["search"]).toLowerCase();
 
 		return ObjUtils.CompareValues("<]", value, search, true);
 	}
@@ -1464,8 +1467,8 @@ class	JsonProcessorMethods
 	static	contains(_data)
 	{
 		// convert to strings
-		let	value = ObjUtils.ToString(_data["value"]).toLowerCase();
-		let	search = ObjUtils.ToString(_data["search"]).toLowerCase();
+		let	value = CoreUtils.ToString(_data["value"]).toLowerCase();
+		let	search = CoreUtils.ToString(_data["search"]).toLowerCase();
 
 		return ObjUtils.CompareValues("€", value, search, true);
 	}
@@ -1479,7 +1482,7 @@ class	JsonProcessorMethods
 
 	static	formatRound(_data)
 	{
-		return ObjUtils.RoundNumber(_data["value"], _data["decimals"]).toString();
+		return MathUtils.Round(_data["value"], _data["decimals"]).toString();
 	}
 
 	static	formatDurationSec(_data)
@@ -1673,13 +1676,13 @@ class	JsonProcessorMethods
 			if (valueBuf != null)
 			{
 				// if a number, check if different than -1
-				if (ObjUtils.IsNumber(valueBuf) == true)
+				if (CoreUtils.IsNumber(valueBuf) == true)
 				{
 					if (valueBuf != -1)
 						return valueBuf;
 				}
 				// if a string, check if not empty
-				else if (StringUtils.IsString(valueBuf) == true)
+				else if (CoreUtils.IsString(valueBuf) == true)
 				{
 					if (StringUtils.IsEmpty(valueBuf) == false)
 						return valueBuf;
@@ -1703,13 +1706,13 @@ class	JsonProcessorMethods
 			if (valueBuf != null)
 			{
 				// if a number, check if different than -1
-				if (ObjUtils.IsNumber(valueBuf) == true)
+				if (CoreUtils.IsNumber(valueBuf) == true)
 				{
 					if (valueBuf != -1)
 						return valueBuf;
 				}
 				// if a string, check if not empty
-				else if (StringUtils.IsString(valueBuf) == true)
+				else if (CoreUtils.IsString(valueBuf) == true)
 				{
 					if (StringUtils.IsEmpty(valueBuf) == false)
 						return valueBuf;
@@ -1838,7 +1841,7 @@ class	JsonProcessorMethods
 
 		for(let i=0; i<_data["list"].length; i++)
 		{
-			if (ObjUtils.IsNumber(_data["list"][i]) == true)
+			if (CoreUtils.IsNumber(_data["list"][i]) == true)
 				total += _data["list"][i];
 		}
 
@@ -1861,7 +1864,7 @@ class	JsonProcessorMethods
 
 		for(let i=0; i<_data["list"].length; i++)
 		{
-			if (ObjUtils.IsNumber(_data["list"][i]) == true)
+			if (CoreUtils.IsNumber(_data["list"][i]) == true)
 			{
 				if ( (minSet == false) || (_data["list"][i] < min) )
 				{
@@ -1881,7 +1884,7 @@ class	JsonProcessorMethods
 
 		for(let i=0; i<_data["list"].length; i++)
 		{
-			if (ObjUtils.IsNumber(_data["list"][i]) == true)
+			if (CoreUtils.IsNumber(_data["list"][i]) == true)
 			{
 				if ( (maxSet == false) || (_data["list"][i] > max) )
 				{
@@ -1897,7 +1900,7 @@ class	JsonProcessorMethods
 	static	processObj(_data)
 	{
 		// make a copy of the object
-		let	objCopy = ObjUtils.Copy(_data["obj"]);
+		let	objCopy = CoreUtils.Copy(_data["obj"]);
 
 		// get the value
 		let	value = ObjUtils.GetValue(objCopy, _data["field"], "");
@@ -1940,27 +1943,27 @@ class	JsonProcessorMethods
 
 	static	fillList(_data)
 	{
-		return ObjUtils.FillList(_data["count"], _data["start"], _data["step"]);
+		return ArrayUtils.Fill(_data["count"], _data["start"], _data["step"]);
 	}
 
 	static	listToStr(_data)
 	{
-		return ObjUtils.ListToString(_data["list"]);
+		return ArrayUtils.ConvertElementsToString(_data["list"]);
 	}
 
 	static	invertListValues(_data)
 	{
-		return ObjUtils.InvertListValues(_data["list"], _data["max"]);
+		return ArrayUtils.InvertValues(_data["list"], _data["max"]);
 	}
 
 	static	fillListColors(_data)
 	{
-		return ObjUtils.FillListColor(_data["count"], _data["color"]);
+		return ArrayUtils.FillWithColor(_data["count"], _data["color"]);
 	}
 
 	static	reverseList(_data)
 	{
-		return ObjUtils.ReverseList(_data["list"]);
+		return ArrayUtils.Reverse(_data["list"]);
 	}
 
 	static	extractFromList(_data)
@@ -2088,7 +2091,7 @@ class	JsonProcessorMethods
 			let	pBuf = _data["p" + i];
 
 			// is it a string?
-			if (StringUtils.IsString(pBuf) == true)
+			if (CoreUtils.IsString(pBuf) == true)
 			{
 				if (pBuf == "~~value~~")
 				{

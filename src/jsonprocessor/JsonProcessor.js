@@ -1,6 +1,8 @@
-import { ObjUtils } from '../utils/ObjUtils';
-import { StringUtils } from '../utils/StringUtils';
-import { JsonProcessorMethods } from './JsonProcessorMethods';
+const { CoreUtils } = require("../utils/CoreUtils");
+const { ObjUtils } = require("../utils/ObjUtils");
+const { ArrayUtils } = require("../utils/ArrayUtils");
+const { StringUtils } = require("../utils/StringUtils");
+const { JsonProcessorMethods } = require("./JsonProcessorMethods");
 
 class	JsonProcessor
 {
@@ -31,7 +33,7 @@ class	JsonProcessor
 	{
 		// add a new context
 		this.__contexts.push({
-			data: ObjUtils.Copy(_data),
+			data: CoreUtils.Copy(_data),
 			cache: {}
 		});
 	}
@@ -143,7 +145,7 @@ class	JsonProcessor
 
 		// sort the list?
 		let	sortByValues = _sortByFields.split("|");
-		let	sortedList = ObjUtils.SortArray(newList, sortByValues);
+		let	sortedList = ArrayUtils.Sort(newList, sortByValues);
 
 		// set it
 		this.setValue(_name, sortedList);		
@@ -170,7 +172,7 @@ class	JsonProcessor
 	cacheSet(_instruction, _value)
 	{
 		if (this.__useCache == true)
-			this.getCache()[_instruction] = ObjUtils.Copy(_value);
+			this.getCache()[_instruction] = CoreUtils.Copy(_value);
 	}
 
 	process(_instruction)

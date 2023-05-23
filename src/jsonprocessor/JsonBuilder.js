@@ -1,6 +1,7 @@
-import { ObjUtils } from '../utils/ObjUtils';
-import { StringUtils } from '../utils/StringUtils';
-import { JsonProcessor } from './JsonProcessor';
+const { ObjUtils } = require("../utils/ObjUtils");
+const { CoreUtils } = require("../utils/CoreUtils");
+const { StringUtils } = require("../utils/StringUtils");
+const { JsonProcessor } = require("./JsonProcessor");
 
 class	JsonBuilder
 {
@@ -48,12 +49,12 @@ class	JsonBuilder
 		// - ADD?
 		else if (_operator == JsonBuilder.OPERATOR_ADD)
 		{
-			newValue = this.getValueToNumber(_path, 0) + StringUtils.ToNumber(_value);
+			newValue = this.getValueToNumber(_path, 0) + CoreUtils.ToNumber(_value);
 		}
 		// - SUB?
 		else if (_operator == JsonBuilder.OPERATOR_SUB)
 		{
-			newValue = this.getValueToNumber(_path, 0) - StringUtils.ToNumber(_value);
+			newValue = this.getValueToNumber(_path, 0) - CoreUtils.ToNumber(_value);
 		}
 
 		// set it

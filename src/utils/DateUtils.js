@@ -1,4 +1,6 @@
 const { ObjUtils } = require("./ObjUtils");
+const { ArrayUtils } = require("./ArrayUtils");
+const { MathUtils } = require("./MathUtils");
 
 class	DateUtils
 {
@@ -242,7 +244,7 @@ class	DateUtils
 		};
 
 		// round the value
-		_value = ObjUtils.RoundNumber(_value, 1);
+		_value = MathUtils.Round(_value, 1);
 
 		// build the path
 		let	path = _type;
@@ -577,7 +579,7 @@ class	DateUtils
 	static	AddTimer(_timers, _title)
 	{
 		// nothing in the array?
-		if (ObjUtils.IsArrayEmpty(_timers) == true)
+		if (ArrayUtils.IsEmpty(_timers) == true)
 			return DateUtils.CreateTimer(_title);
 
 		// add a new timer in the array

@@ -1,6 +1,7 @@
 import { HttpMethod } from '@vertx/core/options';
-import { ObjUtils } from '../utils/ObjUtils';
-import { StringUtils } from '../utils/StringUtils';
+const { ObjUtils } = require("../utils/ObjUtils");
+const { StringUtils } = require("../utils/StringUtils");
+const { LogUtils } = require("../utils/LogUtils");
 
 class	QueryUtils
 {
@@ -40,7 +41,7 @@ class	QueryUtils
 	responseException(_e)
 	{
 		// output log
-		ObjUtils.LogError("Uncaught exception in: " + this.getFullURI());
+		LogUtils.LogError("Uncaught exception in: " + this.getFullURI());
 		if (_e)
 			console.trace(_e);
 
@@ -50,7 +51,7 @@ class	QueryUtils
 
 	responseNotFound()
 	{
-		ObjUtils.LogError("Not found: " + this.getFullURI());
+		LogUtils.LogError("Not found: " + this.getFullURI());
 
 		// output response error
 		this.__ctx.fail(404);
@@ -58,7 +59,7 @@ class	QueryUtils
 
 	responseFail(_code, _msg="")
 	{
-		ObjUtils.LogError("Error " + _code + ": " + this.getFullURI(), {"error_msg": _msg});
+		LogUtils.LogError("Error " + _code + ": " + this.getFullURI(), {"error_msg": _msg});
 
 		// output response error
 		this.__ctx.fail(_code);
@@ -92,7 +93,7 @@ class	QueryUtils
 			}
 			else
 			{
-				ObjUtils.LogError("Error forwarding (" + statusCode + "): " + this.getFullURI());
+				LogUtils.LogError("Error forwarding (" + statusCode + "): " + this.getFullURI());
 
 				// output response error
 				this.__ctx.fail(statusCode);			
@@ -207,7 +208,7 @@ class	QueryUtils
 			return QueryUtils.HTTP_METHOD_DEL;
 		else
 		{
-			ObjUtils.LogError("Unknown method!");
+			LogUtils.LogError("Unknown method!");
 			return QueryUtils.HTTP_METHOD_GET;
 		}
 	}
@@ -285,7 +286,7 @@ class	QueryUtils
 		}
 		catch
 		{
-			ObjUtils.LogError("Error reading body:", {"body": body});
+			LogUtils.LogError("Error reading body:", {"body": body});
 			return {};
 		}		
 	}

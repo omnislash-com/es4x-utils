@@ -1,8 +1,8 @@
 import { WebClientOptions } from '@vertx/web-client/options';
 import { WebClient } from '@vertx/web-client';
 import { Buffer } from '@vertx/core';
-import { ObjUtils } from '../utils/ObjUtils';
 
+const { LogUtils } = require("../utils/LogUtils");
 
 class	WebClientMgr
 {
@@ -135,14 +135,14 @@ class	WebClientMgr
 		}
 		catch(e)
 		{
-			ObjUtils.LogException(e);
+			LogUtils.LogException(e);
 			return this.processResultException(e, _query, _toJson);
 		}
 	}
 
 	processResultException(_exception, _query, _toJson)
 	{
-		ObjUtils.LogError("WEB Exception raised", _query);
+		LogUtils.LogError("WEB Exception raised", _query);
 		console.trace(_exception);		
 		
 		return {
@@ -180,7 +180,7 @@ class	WebClientMgr
 					}
 					catch
 					{
-						ObjUtils.LogError("WEB error converting to JSON", {
+						LogUtils.LogError("WEB error converting to JSON", {
 							query: _query,
 							result: retContent
 						});
@@ -192,14 +192,14 @@ class	WebClientMgr
 			{
 				retCode = statusCode;
 				retMsg = _result.statusMessage();
-				ObjUtils.LogError("WEB error " + statusCode + ", msg=" + _result.statusMessage(), _query);
+				LogUtils.LogError("WEB error " + statusCode + ", msg=" + _result.statusMessage(), _query);
 			}
 		}
 		else
 		{
 			retCode = 500;
 			retMsg = "Error getting the data";
-			ObjUtils.LogError("WEB error getting the data", _query);
+			LogUtils.LogError("WEB error getting the data", _query);
 		}	
 
 		return {

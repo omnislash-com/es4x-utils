@@ -109,6 +109,20 @@ class	MathUtils
 			return - _value;
 	}
 
+	static	Round(_value, _decimals = 0)
+	{
+		if (_decimals == 0)
+			return Math.round(_value);
+		
+		// calculate our divider
+		let	divider = 10;
+		for(let i=1; i<_decimals; i++)
+			divider = divider * 10;
+			
+		// calculate it
+		return Math.round(_value*divider)/divider;
+	}
+
 	static	RoundUp(_value, _multiple)
 	{
 		if (_value == 0)
@@ -265,6 +279,28 @@ class	MathUtils
 		return _v1 / _v2;
 	}
 
+	static	DoCalculation(_value1, _value2, _calc = "+")
+	{
+		// ADD
+		if (_calc == "+")
+			return _value1 + _value2;
+		// SUB
+		else if (_calc == "-")
+			return _value1 - _value2;
+		// MUL
+		else if (_calc == "*")
+			return _value1 * _value2;
+		// DIV
+		else if (_calc == "/")
+		{
+			if (_value2 != 0)
+				return _value1 / _value2;
+			else
+				return 0;
+		}
+		else
+			return _value1 + _value2;
+	}
 }
 
 module.exports = {
