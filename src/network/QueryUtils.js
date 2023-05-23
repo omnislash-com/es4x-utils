@@ -1,4 +1,5 @@
 import { HttpMethod } from '@vertx/core/options';
+
 const { ObjUtils } = require("../utils/ObjUtils");
 const { StringUtils } = require("../utils/StringUtils");
 const { LogUtils } = require("../utils/LogUtils");

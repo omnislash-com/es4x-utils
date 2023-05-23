@@ -27,7 +27,14 @@
 	"scripts": {
 		"postinstall": "es4x install",
 		"start": "es4x",
-		"test": "es4x test index.test.js",
-		"testtest": "es4x test tests/StringUtils.test.js"
+		"test:ArrayUtils": "es4x test tests/ArrayUtils.test.js",
+		"test:DateUtils": "es4x test tests/DateUtils.test.js",
+		"test:JsonBuilder": "es4x test tests/JsonBuilder.test.js",
+		"test:JsonProcessor": "es4x test tests/JsonProcessor.test.js",
+		"test:JsonProcessorUtils": "es4x test tests/JsonProcessorUtils.test.js",
+		"test:MathUtils": "es4x test tests/MathUtils.test.js",
+		"test:ObjUtils": "es4x test tests/ObjUtils.test.js",
+		"test:StringUtils": "es4x test tests/StringUtils.test.js",
+		"test:UrlUtils": "es4x test tests/UrlUtils.test.js"
 	}
 }
