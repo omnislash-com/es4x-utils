@@ -6,6 +6,7 @@ const { StringUtils } = require("../utils/StringUtils");
 const { DateUtils } = require("../utils/DateUtils");
 const { MathUtils } = require("../utils/MathUtils");
 const { JsonProcessorMethodParam } = require("./JsonProcessorMethodParam");
+const { JsonProcessorUtils } = require("./JsonProcessorUtils");
 
 class	JsonProcessorMethods
 {
@@ -1306,7 +1307,7 @@ class	JsonProcessorMethods
 		if (StringUtils.IsEmpty(_data["fields"]) == false)
 			fieldsToKeep = _data["fields"].split("|");
 
-		return ObjUtils.ExtractObjectsWithFields(_data["obj"], _data["path"], fieldsToKeep, _data["key"], _data["add_key"], _data["add_count"], _data["bool_to_int"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
+		return JsonProcessorUtils.ExtractObjectsWithFields(_data["obj"], _data["path"], fieldsToKeep, _data["key"], _data["add_key"], _data["add_count"], _data["bool_to_int"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
 	}
 
 	static	mergeList(_data)
@@ -1316,7 +1317,7 @@ class	JsonProcessorMethods
 		if (StringUtils.IsEmpty(_data["fields"]) == false)
 			fieldsToKeep = _data["fields"].split("|");
 
-		return ObjUtils.MergeList(_data["list"], _data["key"], _data["add_key"], _data["add_count"], fieldsToKeep, _data["bool_to_int"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
+		return JsonProcessorUtils.MergeList(_data["list"], _data["key"], _data["add_key"], _data["add_count"], fieldsToKeep, _data["bool_to_int"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
 	}
 
 	static	combineObjects(_data)
@@ -1326,7 +1327,7 @@ class	JsonProcessorMethods
 		if (StringUtils.IsEmpty(_data["fields"]) == false)
 			fieldsToKeep = _data["fields"].split("|");
 
-		return ObjUtils.CombineObjectsInList(_data["list"], _data["add_count"], fieldsToKeep, _data["bool_to_int"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
+		return JsonProcessorUtils.CombineObjectsInList(_data["list"], _data["add_count"], fieldsToKeep, _data["bool_to_int"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
 	}	
 
 	static	groupBy(_data)
@@ -1664,7 +1665,7 @@ class	JsonProcessorMethods
 
 	static	filterList(_data)
 	{
-		return ObjUtils.FilterList(_data["list"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
+		return JsonProcessorUtils.FilterList(_data["list"], _data["cond_field"], _data["cond_value"], _data["cond_comp"]);
 	}
 
 	static	first(_data)
@@ -1968,7 +1969,7 @@ class	JsonProcessorMethods
 
 	static	extractFromList(_data)
 	{
-		return ObjUtils.ExtractFromList(_data["list"], _data["field"], _data["add_if_empty"]);
+		return JsonProcessorUtils.ExtractFromList(_data["list"], _data["field"], _data["add_if_empty"]);
 	}
 
 	static	extractFromListMulti(_data)
@@ -1978,12 +1979,12 @@ class	JsonProcessorMethods
 		if (StringUtils.IsEmpty(_data["fields"]) == false)
 			fieldsToKeep = _data["fields"].split("|");
 
-		return ObjUtils.ExtractFromListMulti(_data["list"], fieldsToKeep, _data["default"]);
+		return JsonProcessorUtils.ExtractFromListMulti(_data["list"], fieldsToKeep, _data["default"]);
 	}
 
 	static	extractFromListCalc(_data)
 	{
-		return ObjUtils.ExtractFromListWithCalculation(_data["list"], _data["field1"], _data["field2"], _data["calc"]);
+		return JsonProcessorUtils.ExtractFromListWithCalculation(_data["list"], _data["field1"], _data["field2"], _data["calc"]);
 	}
 
 	static	createObject(_data)

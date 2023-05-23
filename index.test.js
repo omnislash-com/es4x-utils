@@ -11,6 +11,7 @@ import { UrlUtils } from './src/utils/UrlUtils';
 import { MathUtils } from './src/utils/MathUtils';
 import { JsonProcessor } from './src/jsonprocessor/JsonProcessor';
 import { JsonBuilder } from './src/jsonprocessor/JsonBuilder';
+import { JsonProcessorUtils } from './src/jsonprocessor/JsonProcessorUtils';
 
 const suite = TestSuite.create("ES4X Utils");
 
@@ -3592,7 +3593,7 @@ suite.test("ObjUtils.MergeList", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// merge the list
-		let	final = ObjUtils.MergeList(tests[i].list, "name", tests[i].options.add_key, tests[i].options.add_count, tests[i].options.to_keep, tests[i].options.bool_to_int, tests[i].options.condition.field, tests[i].options.condition.value, tests[i].options.condition.comparison);
+		let	final = JsonProcessorUtils.MergeList(tests[i].list, "name", tests[i].options.add_key, tests[i].options.add_count, tests[i].options.to_keep, tests[i].options.bool_to_int, tests[i].options.condition.field, tests[i].options.condition.value, tests[i].options.condition.comparison);
 
 		if (final.length != tests[i].length)
 		{
@@ -4341,7 +4342,7 @@ suite.test("ObjUtils.FilterList", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// filter the list
-		let	result = ObjUtils.FilterList(list, tests[i].field, tests[i].value, tests[i].comparison);
+		let	result = JsonProcessorUtils.FilterList(list, tests[i].field, tests[i].value, tests[i].comparison);
 
 		// compare the size
 		if (result.length != tests[i].length)
@@ -4876,7 +4877,7 @@ suite.test("ObjUtils.ExtractFromList", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.ExtractFromList(tests[i].list, tests[i].field);
+		let	result = JsonProcessorUtils.ExtractFromList(tests[i].list, tests[i].field);
 
 		// compare the size
 		if (result.length != tests[i].length)
@@ -4931,7 +4932,7 @@ suite.test("ObjUtils.ExtractFromListMulti", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.ExtractFromListMulti(tests[i].list, tests[i].fields, 0);
+		let	result = JsonProcessorUtils.ExtractFromListMulti(tests[i].list, tests[i].fields, 0);
 
 		// compare the size
 		if (result.length != tests[i].length)
@@ -5014,7 +5015,7 @@ suite.test("ObjUtils.ExtractFromListWithCalculation", function (context) {
 	for(let i=0; i<tests.length; i++)
 	{
 		// fill the list
-		let	result = ObjUtils.ExtractFromListWithCalculation(tests[i].list, tests[i].field1, tests[i].field2, tests[i].calc);
+		let	result = JsonProcessorUtils.ExtractFromListWithCalculation(tests[i].list, tests[i].field1, tests[i].field2, tests[i].calc);
 
 		// compare the size
 		if (result.length != tests[i].list.length)
@@ -7140,7 +7141,7 @@ suite.test("ObjUtils.ExtractObjectsWithFields", function (context) {
 	{
 		// create the new object
 		let	obj = ObjUtils.GetValue(data, tests[i].pathObj);
-		let	result = ObjUtils.ExtractObjectsWithFields(obj, tests[i].path, tests[i].tocopy);
+		let	result = JsonProcessorUtils.ExtractObjectsWithFields(obj, tests[i].path, tests[i].tocopy);
 
 		// do the tests
 		for(const key in tests[i].tocheck)
@@ -7264,7 +7265,7 @@ suite.test("ObjUtils.ExtractObjectsWithFields With Merge", function (context) {
 	let	conditionField = "";
 	let	conditionValue = "";
 	let	conditionComp = "==";
-	let	result = ObjUtils.ExtractObjectsWithFields(data, "matches.player.traits", fieldsToKeep, mergeKey, true, true, true, conditionField, conditionValue, conditionComp);
+	let	result = JsonProcessorUtils.ExtractObjectsWithFields(data, "matches.player.traits", fieldsToKeep, mergeKey, true, true, true, conditionField, conditionValue, conditionComp);
 
 	context.assertEquals(result.length, 4);	
 
@@ -7563,7 +7564,7 @@ suite.test("ObjUtils.ExtractObjectsWithFields With Merge2", function (context) {
 
 	for(let i=0; i<tests.length; i++)
 	{
-		let	result = ObjUtils.ExtractObjectsWithFields(ObjUtils.GetValue(data, "matches"), "players.traits", tests[i].fieldsToKeep, tests[i].mergeKey, true, true, true, tests[i].conditionField, tests[i].conditionValue, tests[i].conditionComp);
+		let	result = JsonProcessorUtils.ExtractObjectsWithFields(ObjUtils.GetValue(data, "matches"), "players.traits", tests[i].fieldsToKeep, tests[i].mergeKey, true, true, true, tests[i].conditionField, tests[i].conditionValue, tests[i].conditionComp);
 
 //		console.log(result);
 	
@@ -7682,7 +7683,7 @@ suite.test("ObjUtils.MergeList TEST", function (context) {
 		}
 	];
 
-	let	result = ObjUtils.MergeList(data, "id", true, true, null, true);
+	let	result = JsonProcessorUtils.MergeList(data, "id", true, true, null, true);
 
 	context.assertEquals(result.length, 3);
 	context.assertEquals(result[0].key, "trait1");

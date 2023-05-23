@@ -162,120 +162,6 @@ class	ObjUtils
 		return StringUtils.ToFloat(ObjUtils.GetValue(_obj, _path, _default));
 	}
 
-	static	SetValue(_obj, _path, _value, _createIfNull = true, _appendToArray = false)
-	{
-		// path empty?
-		if (StringUtils.IsEmpty(_path) == true)
-			return _obj;
-
-		// is the object an array?
-		if (CoreUtils.IsArray(_obj) == true)
-		{
-			for(let i=0; i<_obj.length; i++)
-			{
-				_obj[i] = ObjUtils.SetValue(_obj[i], _path, _value);
-			}
-			return _obj;
-		}
-
-		// split it with "."
-		let	chunks = _path.split(".");
-		let	fieldToEdit = chunks[chunks.length-1];
-
-		// get the object before
-		let	subPath = "";
-		let	subObject = _obj;
-		if (chunks.length >= 2)
-		{
-			// create the subpath
-			subPath = chunks.splice(0, chunks.length-1).join(".");
-
-			// get the object
-			subObject = ObjUtils.GetValue(_obj, subPath, null);
-
-			// that object doesn't exist?
-			if (subObject == null)
-			{
-				if (_createIfNull == true)
-					subObject = {};
-				else
-					return _obj;
-			}
-		}
-
-		// ensure sub object is an object
-		if (CoreUtils.IsValid(subObject) == false)
-			subObject = {};
-
-		// if it's not an object, we exit
-		if (CoreUtils.IsObject(subObject) == false)
-			return _obj;
-
-		// are we editing an array?
-		let	arrayPathInfo = ObjUtils.GetArrayIndexFromPathWithObject(fieldToEdit, subObject, true);
-		if (arrayPathInfo != null)
-		{
-			// get the object
-			let	arrayToSet = ObjUtils.GetValue(subObject, arrayPathInfo.path, []);
-
-			// if it's a proper array
-			if (CoreUtils.IsArray(arrayToSet) == true)
-			{
-				// get the index
-				let	indexToUse = arrayPathInfo.index;
-
-				// make sure we have enough index
-				while(arrayToSet.length < indexToUse)
-					arrayToSet.push(null);
-
-				// set the item in the array
-				arrayToSet[indexToUse] = _value;
-
-				// set the array in the object
-				subObject[arrayPathInfo.path] = arrayToSet;
-			}
-			else
-				return _obj;
-		}
-		else
-		{
-			// if we need to append an array, we check for things
-			if (_appendToArray == true)
-			{
-				// initialize the array
-				if (ObjUtils.HasProperty(subObject, fieldToEdit) == false)
-					subObject[fieldToEdit] = [];
-				if (CoreUtils.IsNull(subObject[fieldToEdit]) == true)
-					subObject[fieldToEdit] = [];
-
-				// if it's an array and the value is not null
-				if ( (CoreUtils.IsArray(subObject[fieldToEdit]) == true) && (CoreUtils.IsNull(_value) == false) )
-				{
-					// if it's an array
-					if (CoreUtils.IsArray(_value) == true)
-					{
-						subObject[fieldToEdit] = subObject[fieldToEdit].concat(_value);
-					}
-					else
-					{
-						subObject[fieldToEdit].push(_value);
-					}
-				}
-			}
-			else
-			{
-				// set the value
-				subObject[fieldToEdit] = _value;
-			}
-		}
-
-		// if we have a sub path, we recursively set it
-		if (StringUtils.IsEmpty(subPath) == false)
-			return ObjUtils.SetValue(_obj, subPath, subObject);
-		else
-			return subObject;
-	}
-
 	static	GetValueToString(_obj, _path, _default = "")
 	{
 		// get the value
@@ -415,6 +301,120 @@ class	ObjUtils
 	
 		// error somewhere
 		return _default;
+	}
+
+	static	SetValue(_obj, _path, _value, _createIfNull = true, _appendToArray = false)
+	{
+		// path empty?
+		if (StringUtils.IsEmpty(_path) == true)
+			return _obj;
+
+		// is the object an array?
+		if (CoreUtils.IsArray(_obj) == true)
+		{
+			for(let i=0; i<_obj.length; i++)
+			{
+				_obj[i] = ObjUtils.SetValue(_obj[i], _path, _value);
+			}
+			return _obj;
+		}
+
+		// split it with "."
+		let	chunks = _path.split(".");
+		let	fieldToEdit = chunks[chunks.length-1];
+
+		// get the object before
+		let	subPath = "";
+		let	subObject = _obj;
+		if (chunks.length >= 2)
+		{
+			// create the subpath
+			subPath = chunks.splice(0, chunks.length-1).join(".");
+
+			// get the object
+			subObject = ObjUtils.GetValue(_obj, subPath, null);
+
+			// that object doesn't exist?
+			if (subObject == null)
+			{
+				if (_createIfNull == true)
+					subObject = {};
+				else
+					return _obj;
+			}
+		}
+
+		// ensure sub object is an object
+		if (CoreUtils.IsValid(subObject) == false)
+			subObject = {};
+
+		// if it's not an object, we exit
+		if (CoreUtils.IsObject(subObject) == false)
+			return _obj;
+
+		// are we editing an array?
+		let	arrayPathInfo = ObjUtils.GetArrayIndexFromPathWithObject(fieldToEdit, subObject, true);
+		if (arrayPathInfo != null)
+		{
+			// get the object
+			let	arrayToSet = ObjUtils.GetValue(subObject, arrayPathInfo.path, []);
+
+			// if it's a proper array
+			if (CoreUtils.IsArray(arrayToSet) == true)
+			{
+				// get the index
+				let	indexToUse = arrayPathInfo.index;
+
+				// make sure we have enough index
+				while(arrayToSet.length < indexToUse)
+					arrayToSet.push(null);
+
+				// set the item in the array
+				arrayToSet[indexToUse] = _value;
+
+				// set the array in the object
+				subObject[arrayPathInfo.path] = arrayToSet;
+			}
+			else
+				return _obj;
+		}
+		else
+		{
+			// if we need to append an array, we check for things
+			if (_appendToArray == true)
+			{
+				// initialize the array
+				if (ObjUtils.HasProperty(subObject, fieldToEdit) == false)
+					subObject[fieldToEdit] = [];
+				if (CoreUtils.IsNull(subObject[fieldToEdit]) == true)
+					subObject[fieldToEdit] = [];
+
+				// if it's an array and the value is not null
+				if ( (CoreUtils.IsArray(subObject[fieldToEdit]) == true) && (CoreUtils.IsNull(_value) == false) )
+				{
+					// if it's an array
+					if (CoreUtils.IsArray(_value) == true)
+					{
+						subObject[fieldToEdit] = subObject[fieldToEdit].concat(_value);
+					}
+					else
+					{
+						subObject[fieldToEdit].push(_value);
+					}
+				}
+			}
+			else
+			{
+				// set the value
+				subObject[fieldToEdit] = _value;
+			}
+		}
+
+		// if we have a sub path, we recursively set it
+		if (StringUtils.IsEmpty(subPath) == false)
+			return ObjUtils.SetValue(_obj, subPath, subObject);
+		else
+			return subObject;
 	}
 
 	static	GetArrayIndexFromPathWithObject(_path, _obj, _canCreate = false)
@@ -1225,36 +1225,6 @@ class	ObjUtils
 		return conditions;
 	}
 
-	static	CleanConditionsPath(_conditions, _path)
-	{
-		let	newConditions = [];
-		for(let condition of _conditions)
-		{
-			let	newField = condition.field;
-			if (newField.startsWith(_path + ".") == true)
-				newField = newField.replace(_path + ".", "");
-			newConditions.push({
-				field: newField,
-				value: condition.value,
-				comparison: condition.comparison
-			});
-		}
-		return newConditions;
-	}
-
-	static	FilterConditions(_conditions, _fields)
-	{
-		let	newConditions = [];
-		for(let condition of _conditions)
-		{
-			if (_fields.includes(condition.field) == true)
-			{
-				newConditions.push(condition);
-			}
-		}
-		return newConditions;
-	}
-
 	static	FindFirst(_list, _conditionField, _conditionValue, _conditionComparison = "==", _default = null, _returnIndex = false)
 	{
 		// not an array?
@@ -1273,102 +1243,6 @@ class	ObjUtils
 		}
 
 		return _returnIndex ? -1 : _default;
-	}
-
-	static	FilterList(_list, _conditionField, _conditionValue, _conditionComparison = "==")
-	{
-		let	newList = [];
-
-		// extract the conditions
-		let	conditions = ObjUtils.ExtractConditions(_conditionField, _conditionValue, _conditionComparison);
-
-		for(let i=0; i<_list.length; i++)
-		{
-			// validates the condition?
-			let	itemOk = ObjUtils.ValidatesConditionList(_list[i], conditions);
-			if (itemOk)
-				newList.push(_list[i]);
-		}
-
-		return newList;
-	}
-
-	static	MergeList(_list, _key, _addKey = false, _addCount = false, _keysToKeep = null, _convertBoolToInt = true, _conditionField = "", _conditionValue = "", _conditionComparison = "==", _keyFieldName = "key", _countFieldName = "count")
-	{
-		// extract the conditions
-		let	conditions = ObjUtils.ExtractConditions(_conditionField, _conditionValue, _conditionComparison);
-
-		return ObjUtils.MergeListWithConditions(_list, _key, _addKey, _addCount, _keysToKeep, _convertBoolToInt, conditions, _keyFieldName, _countFieldName);
-	}
-
-	static	MergeListWithConditions(_list, _key, _addKey = false, _addCount = false, _keysToKeep = null, _convertBoolToInt = true, _conditions = [], _keyFieldName = "key", _countFieldName = "count")
-	{
-		// first we group the object by the keys
-		let	groups = ObjUtils.GroupBy(_list, _key);
-
-		// now we merge each group
-		let	finalList = [];
-		for(let groupToMerge of groups)
-		{
-			if (groupToMerge.length > 0)
-			{
-				// merge them
-				let	newObject = ObjUtils.CombineObjectsInListWithConditions(groupToMerge, _addCount, _keysToKeep, _convertBoolToInt, _conditions, _keyFieldName, _countFieldName);
-				if (newObject != null)
-				{
-					// add the key?
-					if (_addKey == true)
-					{
-						newObject[_keyFieldName] = ObjUtils.GetValue(groupToMerge[0], _key, "");
-					}
-
-					// add the combined object
-					finalList.push(newObject);
-				}
-			}
-		}
-
-		return finalList;		
-	}
-
-	static	CombineObjectsInList(_list, _addCount = false, _keysToKeep = null, _convertBoolToInt = true, _conditionField = "", _conditionValue = "", _conditionComparison = "==", _keyFieldName = "key", _countFieldName = "count")
-	{
-		// extract the conditions
-		let	conditions = ObjUtils.ExtractConditions(_conditionField, _conditionValue, _conditionComparison);
-
-		return ObjUtils.CombineObjectsInListWithConditions(_list, _addCount, _keysToKeep, _convertBoolToInt, conditions, _keyFieldName, _countFieldName);
-	}
-
-	static	CombineObjectsInListWithConditions(_list, _addCount = false, _keysToKeep = null, _convertBoolToInt = true, _conditions = [], _keyFieldName = "key", _countFieldName = "count")
-	{
-		let	finalObject = {};
-		let	objectsCombined = 0;
-
-		let	checkForCondition = _conditions.length > 0;
-		for(let obj of _list)
-		{
-			// do we need to check for a condition?
-			let	itemOk = checkForCondition ? ObjUtils.ValidatesConditionList(obj, _conditions) : true;
-			if (itemOk == true)
-			{
-				// merge the objects
-				finalObject = ObjUtils.MergeObjects(finalObject, obj, _keysToKeep, _convertBoolToInt);
-				objectsCombined += 1;
-			}
-		}		
-
-		// nothing?
-		if (objectsCombined == 0)
-			return null;
-
-		// do we add the count?
-		if (_addCount == true)
-		{
-			if (finalObject.hasOwnProperty(_countFieldName) == false)
-				finalObject[_countFieldName] = objectsCombined;
-		}
-
-		return finalObject;
 	}
 
 	static	MergeObjectsFromKeys(_object, _objectToAdd, _keysToKeep, _convertBoolToInt = true)
@@ -1871,86 +1745,6 @@ class	ObjUtils
 		return newList;
 	}
 
-	static	ExtractFromList(_list, _field, _addIfEmpty = false)
-	{
-		let	newList = [];
-
-		if (CoreUtils.IsArray(_list) == true)
-		{
-			for(let i=0; i<_list.length; i++)
-			{
-				// get the value
-				let	value = ObjUtils.GetValue(_list[i], _field, null);
-
-				// is it empty?
-				let	isEmpty = value == null;
-				if (isEmpty == false)
-				{
-					if (CoreUtils.IsString(value) == true)
-						isEmpty = StringUtils.IsEmpty(value);
-				}
-
-				if ( (isEmpty == false) || (_addIfEmpty == true) )
-					newList.push(value);
-			}
-		}
-
-		return newList;
-	}
-
-	static	ExtractFromListMulti(_list, _fields, _default=null)
-	{
-		let	newList = [];
-
-		if (CoreUtils.IsArray(_list) == true)
-		{
-			// foreach item
-			for(let i=0; i<_list.length; i++)
-			{
-				// we're building an array of values
-				let	newValues = [];
-
-				// for each field
-				for(let key of _fields)
-				{
-					// get the value
-					let	value = ObjUtils.GetValue(_list[i], key, _default);
-
-					// add it
-					newValues.push(value);
-				}
-
-				// add the values
-				newList.push(newValues);
-			}
-		}
-
-		return newList;
-	}	
-
-	static	ExtractFromListWithCalculation(_list, _field1, _field2, _calc = "+")
-	{
-		let	newList = [];
-
-		if (CoreUtils.IsArray(_list) == true)
-		{
-			for(let i=0; i<_list.length; i++)
-			{
-				// get both values
-				let	value1 = ObjUtils.GetValueToFloat(_list[i], _field1);
-				let	value2 = ObjUtils.GetValueToFloat(_list[i], _field2);
-
-				// do the operation
-				let	newValue = MathUtils.DoCalculation(value1, value2, _calc);
-
-				// add it
-				newList.push(newValue);
-			}
-		}
-
-		return newList;
-	}
-
 	static	ReplaceAllIdsWithObjectInList(_itemsList, _field, _objectsDict, _keepAssoc)
 	{
 		let	newList = [];
@@ -2013,186 +1807,6 @@ class	ObjUtils
 			}
 		}
 		return keys;
-	}
-
-	static	ExtractObjectsWithFields(_object, _path, _fieldsToKeep, _mergeKey = "", _addKey = false, _addCount = false, _convertBoolToInt = true, _conditionField = "", _conditionValue = "", _conditionComparison = "==", _keyFieldName = "key", _countFieldName = "count")
-	{
-		// prepare the list of conditions
-		let	conditions = ObjUtils.ExtractConditions(_conditionField, _conditionValue, _conditionComparison);
-
-		return ObjUtils.ExtractObjectsWithFieldsWithConditions(_object, _path, _fieldsToKeep, _mergeKey, _addKey, _addCount, _convertBoolToInt, conditions, _keyFieldName, _countFieldName);
-	}
-
-	static	ExtractObjectsWithFieldsWithConditions(_object, _path, _fieldsToKeep, _mergeKey = "", _addKey = false, _addCount = false, _convertBoolToInt = true, _conditions = [], _keyFieldName = "key", _countFieldName = "count")
-	{
-		// we're building a list of objects
-		let	finalObjects = [];
-
-		// convert our object in to a list of things to do
-		let	objectsTodo = ObjUtils.ConvertObjectToList(_object);
-		if (objectsTodo.length == 0)
-			return finalObjects;
-
-		// is the path empty? Then we just copy the fields
-		if (StringUtils.IsEmpty(_path) == true)
-		{
-			// filter the conditions
-			let	finalConditions = ObjUtils.FilterConditions(_conditions, _fieldsToKeep);
-
-			// test each object
-			for(let objBuf of objectsTodo)
-			{
-				// does the object satisfy the conditions?
-				let	objOk = ObjUtils.ValidatesConditionList(objBuf, finalConditions);
-				if (objOk == true)
-				{
-					// let just copy the fields
-					let	newObj = ObjUtils.CopyFieldsOnlyFromList(objBuf, _fieldsToKeep);
-					
-					// add it
-					finalObjects.push(newObj);
-				}
-			}
-		}
-		// we have a path, we're going to have to go in it
-		else
-		{
-			// first we split the path to look at the first key
-			let	pathChunks = _path.split(".");
-			let	currentPath = pathChunks[0];
-			let	remainingPathChunks = pathChunks.length >= 2 ? pathChunks.splice(1) : [];
-			let	remainingPath = remainingPathChunks.join(".");
-
-			// update the list of fields to keep
-			let	fieldsToKeepCurrent = [];
-			let	fieldsToKeepSub = [];
-			for(let fieldToKeep of _fieldsToKeep)
-			{
-				// the field can either be in the current object or in a sub one
-				let	isCurrent = true;
-	
-				// if it includes the ., it can either be a sub field from our current, or it can be in the sub
-				if (fieldToKeep.includes(".") == true)
-				{
-					// split with .
-					let	fieldChunks = fieldToKeep.split(".");
-
-					// if the first chunk is one of the remaining path chunks, that means it;'s sub!
-					if (remainingPathChunks.includes(fieldChunks[0]) == true)
-						isCurrent = false;
-					else if (fieldChunks[0] == currentPath)
-					{
-						isCurrent = false;
-						fieldToKeep = fieldChunks.splice(1).join(".");
-					}
-				}
-
-				// add the field to the right list
-				if (isCurrent == true)
-					fieldsToKeepCurrent.push(fieldToKeep);
-				else
-					fieldsToKeepSub.push(fieldToKeep);
-			}
-
-			// clean the conditions with the current path
-			let	conditionsForNow = ObjUtils.CleanConditionsPath(_conditions, currentPath);
-
-			// process each object in our list
-			for(let objBuf of objectsTodo)
-			{
-				// get the new object
-				let	subObject = ObjUtils.GetValue(objBuf, currentPath);
-
-				// get the list of objects in the sub
-				let	subObjectList = ObjUtils.ExtractObjectsWithFieldsWithConditions(subObject, remainingPath, fieldsToKeepSub, _mergeKey, _addKey, _addCount, _convertBoolToInt, conditionsForNow, _keyFieldName, _countFieldName);
-
-				// do we need to merge the items?
-				if (StringUtils.IsEmpty(_mergeKey) == false)
-				{
-					// clean the list of fields to keep: first we add all for our current path
-					let	fieldsToKeepMerge = [];
-					for(let fieldToKeep of _fieldsToKeep)
-					{
-						if (fieldToKeep.startsWith(currentPath + ".") == true)
-							fieldsToKeepMerge.push(fieldToKeep.replace(currentPath + ".", ""));
-					}
-
-					// if we have a remaining path, we need to re-add all the existing ones
-					if (StringUtils.IsEmpty(remainingPath) == false)
-					{
-						// extract the chunks to add
-						let	chunksToAdd = remainingPath.split(".");
-						for(let fieldToKeep of _fieldsToKeep)
-						{
-							for(let	fieldStart of chunksToAdd)
-							{
-								if (fieldToKeep.startsWith(fieldStart + ".") == true)
-								{
-									// split with : for the rename
-									let	fieldName = fieldToKeep.replace(fieldStart + ".", "");
-									let	fieldNameReal = fieldName.includes(":") ? fieldName.split(":")[1] : fieldName.replace("*", "").replace("@", "");
-
-									// does it start with *?
-									if (fieldName.startsWith("*") == true)
-										fieldsToKeepMerge = fieldsToKeepMerge.concat(ObjUtils.FindAllKeysStartingWithInList(subObjectList, fieldNameReal + "_"));
-									else
-										fieldsToKeepMerge.push(fieldNameReal);
-									break;
-								}
-							}
-						}
-
-						// add count and key?
-						if (_addKey == true)
-							fieldsToKeepMerge.push(_keyFieldName);
-						if (_addCount == true)
-							fieldsToKeepMerge.push(_countFieldName);
-					}
-
-					// if the condition is here: we make sure to add the condition field in each object!!
-					let	finalConditions = ObjUtils.FilterConditions(_conditions, fieldsToKeepCurrent);
-
-					// make sure to set the keys in each object
-					for(let conditionBuf of finalConditions)
-					{
-						let	ourValue = ObjUtils.GetValue(objBuf, conditionBuf.field, "");
-						for(let finalObj of subObjectList)
-						{
-							finalObj[conditionBuf.field] = ourValue;
-						}
-					}
-
-					// verify the condition
-					subObjectList = ObjUtils.MergeListWithConditions(subObjectList, _mergeKey, _addKey, _addCount, fieldsToKeepMerge, _convertBoolToInt, finalConditions, _keyFieldName, _countFieldName);
-				}
-
-				// do we have fields to copy from our own?
-				if (fieldsToKeepCurrent.length > 0)
-				{
-					// extract our own fields
-					let	ourFields = ObjUtils.CopyFieldsOnlyFromList(objBuf, fieldsToKeepCurrent);
-
-					// now we just add each field in each new object
-					for(let finalObj of subObjectList)
-					{
-						for(const key in ourFields)
-						{
-							finalObj[key] = ourFields[key];
-						}
-					}
-				}				
-
-				// add the objects
-				finalObjects = finalObjects.concat(subObjectList);
-			}
-
-			if (StringUtils.IsEmpty(_mergeKey) == false)
-			{
-				finalObjects = ObjUtils.MergeListWithConditions(finalObjects, _mergeKey, _addKey, _addCount, null, _convertBoolToInt, [], _keyFieldName, _countFieldName);
-			}
-		}
-
-		return finalObjects;
 	}
 
 	static	SerializeObject(_obj, _delimiterField = "&", _delimiterValue = "=", _encodeComponents = true)
