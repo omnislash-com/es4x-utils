@@ -27,6 +27,7 @@
 	"scripts": {
 		"postinstall": "es4x install",
 		"start": "es4x",
-		"test": "es4x test index.test.js"
+		"test": "es4x test index.test.js",
+		"testtest": "es4x test tests/StringUtils.test.js"
 	}
 }
