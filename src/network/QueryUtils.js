@@ -112,7 +112,8 @@ class	QueryUtils
 	{
 		// build the final params
 		let	finalParams = {};
-
+console.log("111");
+console.log(this.__ctx);
 		// get the path params
 		let	pathParams = this.__ctx.pathParams();
 		if (pathParams != null)
