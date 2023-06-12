@@ -22,10 +22,6 @@ class	QueryUtils
 		this.__ctx = _ctx;
 		this.__queryParams = null;
 		this.__postParams = null;
-
-		console.log("HERE = ");
-		console.log(_ctx);
-
 	}
 
 	getFullURI()
@@ -112,8 +108,7 @@ class	QueryUtils
 	{
 		// build the final params
 		let	finalParams = {};
-console.log("111");
-console.log(this.__ctx);
+
 		// get the path params
 		let	pathParams = this.__ctx.pathParams();
 		if (pathParams != null)
@@ -304,9 +299,6 @@ console.log(this.__ctx);
 	static	GetPostParams(_ctx)
 	{
 		let	body = _ctx.getBodyAsString();
-		console.log(_ctx);
-		console.log("BODY = ");
-		console.log(body);
 		try
 		{
 			return JSON.parse(body);
