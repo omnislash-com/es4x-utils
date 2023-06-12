@@ -299,6 +299,7 @@ class	QueryUtils
 	static	GetPostParams(_ctx)
 	{
 		let	body = _ctx.getBodyAsString();
+		console.log(_ctx);
 		console.log("BODY = ");
 		console.log(body);
 		try
