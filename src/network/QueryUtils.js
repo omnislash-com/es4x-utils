@@ -22,6 +22,10 @@ class	QueryUtils
 		this.__ctx = _ctx;
 		this.__queryParams = null;
 		this.__postParams = null;
+
+		console.log("HERE = ");
+		console.log(_ctx);
+
 	}
 
 	getFullURI()
@@ -290,8 +294,6 @@ class	QueryUtils
 
 	static	GetPathParam(_ctx, _key, _default="")
 	{
-		console.log("HERE = ");
-		console.log(_ctx);
 		let	value = _ctx.pathParam(_key);
 		if (value == null)
 			value = _default;
