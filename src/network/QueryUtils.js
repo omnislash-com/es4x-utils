@@ -299,6 +299,8 @@ class	QueryUtils
 	static	GetPostParams(_ctx)
 	{
 		let	body = _ctx.getBodyAsString();
+		console.log("BODY = ");
+		console.log(body);
 		try
 		{
 			return JSON.parse(body);
