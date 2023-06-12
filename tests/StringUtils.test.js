@@ -570,4 +570,53 @@ suite.test("StringUtils.IsEmpty", async function (context) {
 	}
 });
 
+suite.test("StringUtils.EnsureSize", async function (context) {
+
+	let	tests = [
+		{
+			str: undefined,
+			length: 10,
+			result: ""
+		},
+		{
+			str: null,
+			length: 10,
+			result: ""
+		},
+		{
+			str: "",
+			length: 10,
+			result: ""
+		},
+		{
+			str: "abcde",
+			length: 10,
+			result: "abcde"
+		},
+		{
+			str: "abcdeabcde",
+			length: 10,
+			result: "abcdeabcde"
+		},
+		{
+			str: "abcdeabcdefffffffffffffff",
+			length: 10,
+			result: "abcdeabcde"
+		},
+	];
+	
+	for(let i=0; i<tests.length; i++)
+	{
+		// convert it
+		let	value = StringUtils.EnsureSize(tests[i].str, tests[i].length);
+
+		if (value != tests[i].result)
+		{
+			console.error("Error: StringUtils.EnsureSize(" + i + ")");
+		}
+		context.assertEquals(value, tests[i].result);
+
+	}
+});
+
 suite.run();

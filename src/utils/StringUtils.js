@@ -624,6 +624,16 @@ class	StringUtils
 		return items;
 	}
 
+	static	EnsureSize(_txt, _length)
+	{
+		if (StringUtils.IsEmpty(_txt) == true)
+			return "";
+		else if (_txt.length > _length)
+			return _txt.substr(0, _length);
+		else
+			return _txt;
+	}
+
 }
 
 module.exports = {
