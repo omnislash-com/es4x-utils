@@ -189,7 +189,7 @@ class	ArrayUtils
 		}
 
 		return true;
-	}	
+	}
 };
 
 module.exports = {

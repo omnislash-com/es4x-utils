@@ -633,7 +633,6 @@ class	StringUtils
 		else
 			return _txt;
 	}
-
 }
 
 module.exports = {

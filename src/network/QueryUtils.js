@@ -253,6 +253,9 @@ class	QueryUtils
 
 	static	GetParam(_ctx, _key, _location, _default="")
 	{
+		if ( (StringUtils.IsEmpty(_key) == true) || (StringUtils.IsEmpty(_location) == true) )
+			return _default;
+
 		// depending on the location
 		// - PATH?
 		if (_location == QueryUtils.PARAM_PATH)
