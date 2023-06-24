@@ -258,12 +258,12 @@ class	QueryUtils
 
 		// depending on the location
 		// - PATH?
-		if (_location == QueryUtils.PARAM_PATH)
+		if ( (_location == QueryUtils.PARAM_PATH) || (_location == "path") )
 		{
 			return QueryUtils.GetPathParam(_ctx, _key, _default);
 		}
 		// - POST?
-		else if (_location == QueryUtils.PARAM_POST)
+		else if ( (_location == QueryUtils.PARAM_POST) || (_location == "body") )
 		{
 			// get the post params
 			let	postParams = QueryUtils.GetPostParams(_ctx);
