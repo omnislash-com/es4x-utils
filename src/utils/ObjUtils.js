@@ -471,7 +471,7 @@ class	ObjUtils
 		};
 	}
 
-	static	Flatten(_obj, _convertToString = false, _flattenArray = false, _prefix = "", _encode = false)
+	static	Flatten(_obj, _convertToString = false, _flattenArray = false, _prefix = "", _encode = false, _onlyValid = false)
 	{
 		let	newObject = {};
 
@@ -529,19 +529,27 @@ class	ObjUtils
 				// if not, we just set the value
 				else
 				{
-					// are we converting to string?
-					if (_convertToString == true)
-						value = CoreUtils.ToString(value);
+					// check if it's valid
+					let	isOk = true;
+					if ( (_onlyValid == true) && (CoreUtils.IsValid(value) == false) )
+						isOk = false;
 
-					// encode?
-					let	keyStr = key;
-					if (_encode == true)
+					if (isOk == true)
 					{
-						value = encodeURIComponent(value);
-						keyStr = encodeURIComponent(keyStr);
-					}
+						// are we converting to string?
+						if (_convertToString == true)
+							value = CoreUtils.ToString(value);
 
-					newObject[_prefix + keyStr] = value;
+						// encode?
+						let	keyStr = key;
+						if (_encode == true)
+						{
+							value = encodeURIComponent(value);
+							keyStr = encodeURIComponent(keyStr);
+						}
+
+						newObject[_prefix + keyStr] = value;
+					}
 				}
 			}
 		}
