@@ -471,7 +471,7 @@ class	ObjUtils
 		};
 	}
 
-	static	Flatten(_obj, _convertToString = false, _flattenArray = false, _prefix = "", _encode = false, _onlyValid = false)
+	static	Flatten(_obj, _convertToString = false, _flattenArray = false, _prefix = "", _encode = false, _onlyValid = false, _encloseBracket = false)
 	{
 		let	newObject = {};
 
@@ -488,12 +488,23 @@ class	ObjUtils
 				if (CoreUtils.IsObject(value) == true)
 				{
 					// flatten that object
-					let	subObject = ObjUtils.Flatten(value, _convertToString, _flattenArray);
+					let	subObject = ObjUtils.Flatten(value, _convertToString, _flattenArray, "", _encode, _onlyValid, _encloseBracket);
 
 					// add all the fields
 					for(const subKey in subObject)
 					{
 						let	newKey = key + "." + subKey;
+						if (_encloseBracket == true)
+						{
+							let	subKeyReal = subKey;
+							if (subKeyReal.endsWith("]") == true)
+								subKeyReal = "[" + StringUtils.ReplaceAll(subKeyReal, "[", "][");
+							else
+								subKeyReal = "[" + subKeyReal + "]";
+
+							newKey = key + subKeyReal;
+						}
+
 						newObject[_prefix + newKey] = subObject[subKey];
 					}
 				}
@@ -507,12 +518,23 @@ class	ObjUtils
 						for(let i=0; i<value.length; i++)
 						{
 							// flatten the content
-							let	subObject = ObjUtils.Flatten(value[i], _convertToString, _flattenArray);
+							let	subObject = ObjUtils.Flatten(value[i], _convertToString, _flattenArray, "", _encode, _onlyValid, _encloseBracket);
 
 							// add all the fields
 							for(const subKey in subObject)
 							{
 								let	newKey = key + "[" + i + "]." + subKey;
+								if (_encloseBracket == true)
+								{
+									let	subKeyReal = subKey;
+									if (subKeyReal.endsWith("]") == true)
+										subKeyReal = "[" + StringUtils.ReplaceAll(subKeyReal, "[", "][");
+									else
+										subKeyReal = "[" + subKeyReal + "]";
+		
+									newKey = key + "[" + i + "]" + subKeyReal;
+								}
+
 								newObject[_prefix + newKey] = subObject[subKey];
 							}
 						}

@@ -3040,5 +3040,53 @@ suite.test("ObjUtils.SerializeObject", async function (context) {
 
 });
 
+suite.test("ObjUtils.Flatten", async function (context) {
+
+	let	tests = [
+		{
+			obj: {
+				mode: "payment",
+				client_reference_id: 5,
+				customer: 2,
+				nullvalue: null,
+				metadata: {
+					key1: "value1",
+					key2: 2
+				},
+				list: [
+					{
+						test: 1,
+						sub: {
+							subsub: "value"
+						}
+					}
+				]
+			},
+			result: {
+				"mode": "payment",
+				"client_reference_id": 5,
+				"customer": 2,
+				"metadata[key1]": "value1",
+				"metadata[key2]": 2,
+				"list[0][test]": 1,
+				"list[0][sub][subsub]": "value",
+			}
+		}
+	];
+
+	for(let test of tests)
+	{
+		let	ret = ObjUtils.Flatten(test.obj, false, true, "", false, true, true);
+
+		for(let key in ret)
+		{
+			context.assertTrue(ObjUtils.HasProperty(test.result, key));
+			context.assertEquals(ret[key], test.result[key]);
+		}
+
+	}
+
+});
+
 
 suite.run();
