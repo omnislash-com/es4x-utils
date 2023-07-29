@@ -471,7 +471,7 @@ class	ObjUtils
 		};
 	}
 
-	static	Flatten(_obj, _convertToString = false, _flattenArray = false, _prefix = "")
+	static	Flatten(_obj, _convertToString = false, _flattenArray = false, _prefix = "", _encode = false)
 	{
 		let	newObject = {};
 
@@ -532,8 +532,16 @@ class	ObjUtils
 					// are we converting to string?
 					if (_convertToString == true)
 						value = CoreUtils.ToString(value);
-					
-					newObject[_prefix + key] = value;
+
+					// encode?
+					let	keyStr = key;
+					if (_encode == true)
+					{
+						value = encodeURIComponent(value);
+						keyStr = encodeURIComponent(keyStr);
+					}
+
+					newObject[_prefix + keyStr] = value;
 				}
 			}
 		}
