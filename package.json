@@ -1,7 +1,7 @@
 {
 	"name": "es4x-utils",
 	"displayName": "ES4X Utils",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Utilities for ES4X to manage basic objects, string, dates but also networking as well as a JSON processing engine.",
 	"main": "index.js",
 	"keywords": ["es4x", "javascript", "vertex"],

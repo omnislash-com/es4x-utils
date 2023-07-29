@@ -3009,5 +3009,36 @@ suite.test("ObjUtils.SetValue", async function (context) {
 
 });
 
+suite.test("ObjUtils.SerializeObject", async function (context) {
+
+	let	tests = [
+		{
+			obj: {
+				mode: "payment",
+				success_url: "https://example.com/success",
+				cancel_url: "https://example.com/cancel",
+				client_reference_id: 5,
+				currency: "usd",
+				customer: 2,
+				nullvalue: null,
+				customer_email: "mike@omnislash.com",
+				metadata: {
+					key1: "value1",
+					key2: 2
+				}
+			},
+			result: "mode=payment&success_url=https%3A%2F%2Fexample.com%2Fsuccess&cancel_url=https%3A%2F%2Fexample.com%2Fcancel&client_reference_id=5&currency=usd&customer=2&customer_email=mike%40omnislash.com&metadata=%7B%22key1%22%3A%22value1%22%2C%22key2%22%3A2%7D"
+		}
+	];
+
+	for(let test of tests)
+	{
+		let	ret = ObjUtils.SerializeObject(test.obj);
+
+		context.assertEquals(ret, test.result);
+	}
+
+});
+
 
 suite.run();

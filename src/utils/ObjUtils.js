@@ -1817,14 +1817,17 @@ class	ObjUtils
 		let	elements = [];
 		for(const key in _obj)
 		{
-			// encode the key
-			let	encodedKey = _encodeComponents ? encodeURIComponent(key) : key;
+			if (CoreUtils.IsValid(_obj[key]) == true)
+			{
+				// encode the key
+				let	encodedKey = _encodeComponents ? encodeURIComponent(key) : key;
 
-			// encode the value
-			let	value = CoreUtils.ToString(_obj[key]);
-			let	encodedValue = _encodeComponents ? encodeURIComponent(value) : value;
+				// encode the value
+				let	value = CoreUtils.ToString(_obj[key]);
+				let	encodedValue = _encodeComponents ? encodeURIComponent(value) : value;
 
-			elements.push(encodedKey + _delimiterValue + encodedValue);
+				elements.push(encodedKey + _delimiterValue + encodedValue);
+			}
 		}
 
 		return elements.join(_delimiterField);
