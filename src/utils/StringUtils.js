@@ -590,6 +590,12 @@ class	StringUtils
 		return rs.KJUR.crypto.Util.sha256(_str);
 	}
 
+	static	HMACSHA256(_key, _message)
+	{
+		let	mac = new rs.KJUR.crypto.Mac({alg: "HmacSHA1", "pass": _key});
+		return mac.doFinalString(_message);
+	}
+
 	static	ParseStreamedJSON(_jsonStr)
 	{
 		// empty?
