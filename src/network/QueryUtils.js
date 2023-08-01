@@ -308,6 +308,8 @@ class	QueryUtils
 	{
 		console.log("HEADERS");
 		console.log( _ctx.request().headers());
+		console.log( _ctx.request().headers().entries());
+		console.log( _ctx.request().headers().names());
 		console.log( _ctx.request().getHeader("X-MyHeader"));
 		return _ctx.request().headers();
 	}
