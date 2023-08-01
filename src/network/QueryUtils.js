@@ -324,7 +324,7 @@ class	QueryUtils
 		let	names = _map.names();
 		for(let name of names)
 		{
-			dict[name] = dict.get(name);
+			dict[name] = _map.get(name);
 		}
 
 		return dict;
