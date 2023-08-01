@@ -592,7 +592,7 @@ class	StringUtils
 
 	static	HMACSHA256(_key, _message)
 	{
-		let	mac = new rs.KJUR.crypto.Mac({alg: "HmacSHA1", "pass": _key});
+		let	mac = new rs.KJUR.crypto.Mac({alg: "HmacSHA256", "pass": _key});
 		return mac.doFinalString(_message);
 	}
 
