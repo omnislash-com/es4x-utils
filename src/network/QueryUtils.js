@@ -306,6 +306,8 @@ class	QueryUtils
 
 	static	GetHeaders(_ctx)
 	{
+		console.log("HEADERS");
+		console.log( _ctx.request().headers());
 		return _ctx.request().headers();
 	}
 
