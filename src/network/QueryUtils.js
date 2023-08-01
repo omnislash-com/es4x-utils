@@ -310,12 +310,7 @@ class	QueryUtils
 		let	headers = _ctx.request().headers();
 
 		// convert it
-		let	finalHeaders = QueryUtils.MultiMapToDictionary(headers);
-
-		console.log("HEADERS");
-		console.log(finalHeaders);
-
-		return finalHeaders;
+		return QueryUtils.MultiMapToDictionary(headers);
 	}
 
 	static	MultiMapToDictionary(_map)
