@@ -223,6 +223,11 @@ class	QueryUtils
 		}
 	}
 
+	getBodyAsString()
+	{
+		return this.__ctx.getBodyAsString();
+	}
+
 	static	StringToHttpMethod(_methodStr)
 	{
 		if (_methodStr == QueryUtils.HTTP_METHOD_POST)
