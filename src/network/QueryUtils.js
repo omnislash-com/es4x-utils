@@ -140,6 +140,11 @@ class	QueryUtils
 		return QueryUtils.GetPathParam(this.__ctx, _key, _default);
 	}
 
+	getHeaders()
+	{
+		return QueryUtils.GetHeaders(this.__ctx);
+	}
+
 	postParams()
 	{
 		// init them?
@@ -298,6 +303,11 @@ class	QueryUtils
 			value = _default;
 		return value;
 	}	
+
+	static	GetHeaders(_ctx)
+	{
+		return _ctx.request().headers();
+	}
 
 	static	GetPostParams(_ctx)
 	{
