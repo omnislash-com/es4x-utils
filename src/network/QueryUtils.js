@@ -306,12 +306,28 @@ class	QueryUtils
 
 	static	GetHeaders(_ctx)
 	{
+		// get the headers as a MultiMap
+		let	headers = _ctx.request().headers();
+
+		// convert it
+		let	finalHeaders = QueryUtils.MultiMapToDictionary(headers);
+
 		console.log("HEADERS");
-		console.log( _ctx.request().headers());
-		console.log( _ctx.request().headers().entries());
-		console.log( _ctx.request().headers().names());
-		console.log( _ctx.request().getHeader("X-MyHeader"));
-		return _ctx.request().headers();
+		console.log(finalHeaders);
+
+		return finalHeaders;
+	}
+
+	static	MultiMapToDictionary(_map)
+	{
+		let	dict = {};
+		let	names = _map.names();
+		for(let name of names)
+		{
+			dict[name] = dict.get(name);
+		}
+
+		return dict;
 	}
 
 	static	GetPostParams(_ctx)
