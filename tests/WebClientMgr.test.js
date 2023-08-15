@@ -4,11 +4,12 @@ import { TestSuite } from '@vertx/unit';
 import { ObjUtils } from '../src/utils/ObjUtils';
 import { WebClientMgr } from '../src/network/WebClientMgr';
 import { QueryUtils } from '../src/network/QueryUtils';
+import { StringUtils } from '../src/utils/StringUtils';
 
 const suite = TestSuite.create("ES4X Test: WebClientMgr");
 
 
-suite.test("appContext.postFormFromHostToJson", async function (context) {
+suite.test("WebClientMgr.query", async function (context) {
 
 	let async = context.async();
 
@@ -22,6 +23,23 @@ suite.test("appContext.postFormFromHostToJson", async function (context) {
 	let	response = await webClient.query(method, host, path);
 
 	context.assertEquals(ObjUtils.GetValueToInt(response, "statusCode"), 200);
+	async.complete();
+});
+
+suite.test("WebClientMgr.retrieveRedirectUrl", async function (context) {
+
+	let async = context.async();
+
+	let	webClient = new WebClientMgr(vertx);
+
+	// Get redirection url
+	let	url = "https://u298828.ct.sendgrid.net/ss/c/KeecV0-eUYdPWIcLaNcQIk8KHRb5oSkirDE8JL2zHb43giRdffV4A9P-M2zuA5z8yn9k718SwxXLtsouqB_R0O55ERXeLn0ds7a6ThnkVIhw5R4CdUnuKmbjjJGs4N_u-Y_q1d42X8m2X86YFqjRx5OTiDvKvQFMwBiX2vZIv0u-Od-we0xwDqTb8WFSQKv8_teiWcZNOJc2xnTVUxruXT65tspY-nE9awn_Xy8Cn_0Ktog5q4E678T6EuVuCv9DdzenxCoY0ncsx9HAUMZohZ8pG_k8CD7GoAPKxTsIsbPCHASomRcDviuhluGqohU66nmkRso0YaI7U-3i-URrFxjAdSE8hP8QyEJxZBnmNy18yzudN8aQDmsXdWRP3jXcRP_94jay3-M9Yko4WyC9Zow8gsNXxmVFmKQFEhsbVAclawEq3XiPhp6v9PPIQGoyd85lRByH4LKafqZmWq685nYiIKF-z8QNi67tsbW6lBE/3yr/-hXtnp6vQYijkOPr38OyDw/h9/Itd-_deiQpGDPuuGSBzlAPwq7Xw9FByxaFEMHxlBW7E";
+
+	let	redirectUrl = await webClient.retrieveRedirectUrl(url);
+	console.log("Redirect URL = ");
+	console.log(redirectUrl);
+
+	context.assertFalse(StringUtils.IsEmpty(redirectUrl));
 	async.complete();
 });
 

@@ -1,6 +1,7 @@
 import { WebClientOptions } from '@vertx/web-client/options';
 import { WebClient } from '@vertx/web-client';
 import { Buffer } from '@vertx/core';
+import { StringUtils } from '../utils/StringUtils';
 
 const { LogUtils } = require("../utils/LogUtils");
 const { QueryUtils } = require("./QueryUtils");
@@ -269,6 +270,43 @@ class	WebClientMgr
 			statusMessage: retMsg,
 			content: retContent
 		};
+	}
+
+	async	retrieveRedirectUrl(_absoluteUrl)
+	{
+		// create the request
+		let	request = this.__webClient.getAbs(_absoluteUrl);
+
+		// make sure to not follow the redirections
+		request = request.followRedirects(false);
+
+		// send it
+		try
+		{
+			// send the query
+			let	result = await request.send();
+
+			// extract the redirection URL
+			if (result != null)
+			{
+				let	redirectUrl = result.getHeader("Location");
+				if (StringUtils.IsEmpty(redirectUrl) == true)
+				{
+					LogUtils.LogError("WEB error no redirect url from: ", _absoluteUrl);
+					return "";
+				}
+				else
+				{
+					return redirectUrl;
+				}
+			}
+		}
+		catch(e)
+		{
+			LogUtils.LogException(e);
+			LogUtils.LogError("WEB error getting the redirect url from: ", _absoluteUrl);
+			return "";
+		}				
 	}
 }
 
