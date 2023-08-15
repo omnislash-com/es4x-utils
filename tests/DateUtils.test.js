@@ -244,6 +244,19 @@ suite.test("DateUtils.DayNumberToDayOfTheWeek", function (context) {
 
 		context.assertEquals(result, tests[i].result);
 	}
+
+
+	let	testToOutput = [
+		"2023-08-01",
+		"2023-12-31",
+		"2024-01-01",
+		"2024-07-31",
+	];
+	for(let date of testToOutput)
+	{
+		console.log("TEST: " + date + " => " + DateUtils.UTCStringToLocalDayNumber(date));
+	}
+
 });
 
 suite.test("DateUtils.UTCStringToLocalTimestamp", function (context) {

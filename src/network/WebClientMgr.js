@@ -48,7 +48,7 @@ class	WebClientMgr
 		}
 		else 
 		{
-			LogUtils.LogError("Error: unknown method: " + _query.method);
+			LogUtils.LogError("Error: unknown method: " + _method);
 		}
 
 		return result;
