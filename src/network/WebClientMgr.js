@@ -225,7 +225,7 @@ class	WebClientMgr
 		{
 			// all good?
 			let	statusCode = _result.statusCode();
-			if (statusCode == 200)
+			if ( (statusCode >= 200) && (statusCode < 300) )
 			{
 				retCode = 200;
 				retMsg = "success";
