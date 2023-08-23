@@ -1,4 +1,5 @@
 import { HttpMethod } from '@vertx/core/options';
+import { UAParser } from 'ua-parser-js';
 
 
 const { ObjUtils } = require("../utils/ObjUtils");
@@ -343,6 +344,59 @@ class	QueryUtils
 			return {};
 		}		
 	}
+
+
+	getUserAgentInfo()
+	{
+		return QueryUtils.GetUserAgent(this.__ctx);
+	}
+
+	static	GetUserAgent(_ctx)
+	{
+		// get the headers
+		let headers = QueryUtils.GetHeaders(_ctx);
+
+		// get the user agent
+		let	userAgentStr = ObjUtils.GetValueToString(headers, "User-Agent");
+		if (StringUtils.IsEmpty(userAgentStr) == true)
+			userAgentStr = ObjUtils.GetValueToString(headers, "user-agent");
+
+		return QueryUtils.ParseUserAgent(userAgentStr);
+	}
+
+	static	ParseUserAgent(_userAgentStr)
+	{
+		if (StringUtils.IsEmpty(_userAgentStr) == true)
+			return null;
+
+		let parser = new UAParser(_userAgentStr);
+		return parser.getResult();
+	}
+
+	getRemoteAddress()
+	{
+		return QueryUtils.GetRemoteAddress(this.__ctx);
+	}
+
+	static	GetRemoteAddress(_ctx)
+	{
+		// get the headers
+		let headers = QueryUtils.GetHeaders(_ctx);
+
+		// let's look if it's forwarded
+		let	address = ObjUtils.GetValueToString(headers, "x-forwarded-for");
+		if (StringUtils.IsEmpty(address) == false)
+			return address;
+
+		// get the connection
+		address = _ctx.request().remoteAddress().hostAddress();
+
+		// manage empty
+		if (StringUtils.IsEmpty(address) == true)
+			return null;
+		
+		return address;
+	}	
 }
 
 module.exports = {
