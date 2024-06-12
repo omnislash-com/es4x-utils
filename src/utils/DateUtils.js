@@ -436,6 +436,18 @@ class	DateUtils
 		return DateUtils.TimestampToDayNumber(ts);
 	}
 
+	static	DayNumberToYearMonth(_dayNumber, _sep = "-")
+	{
+		// convert the day number to a date
+		let	date = DateUtils.DayToDate(_dayNumber);
+
+		let	mm = date.getUTCMonth() + 1; // getMonth() is zero-based
+
+		return [date.getUTCFullYear(),
+				(mm>9 ? '' : '0') + mm
+				].join(_sep);
+	}
+
 	static	DayNumberToDayOfTheWeek(_dayNumber)
 	{
 		// convert the day number to a date

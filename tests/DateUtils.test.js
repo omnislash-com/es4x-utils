@@ -458,6 +458,41 @@ suite.test("DateUtils.GetCurrentWeekDayNumber", function (context) {
 
 });
 
+suite.test("DateUtils.DayNumberToYearMonth", function (context) {
+
+	let	tests = [
+		{
+			day: 8613,
+			result: "2023-08"
+		},
+		{
+			day: 8765,
+			result: "2023-12"
+		},
+		{
+			day: 8766,
+			result: "2024-01"
+		},
+		{
+			day: 8978,
+			result: "2024-07"
+		},				
+	];
+
+	for(let test of tests)
+	{
+		let	result = DateUtils.DayNumberToYearMonth(test.day);
+
+		if (result != test.result)
+		{
+			console.error("Error with " + result + " not equals to " + test.result + ", day = " + test.day);
+		}		
+
+		context.assertEquals(result, test.result);
+	}
+
+});
+
 suite.test("DateUtils.NowToUniqString", function (context) {
 
 	// get it
@@ -465,7 +500,7 @@ suite.test("DateUtils.NowToUniqString", function (context) {
 
 	// test
 	console.log("Now uniq = " + str);
-	context.assertTrue(str.startsWith("2023"));
+	context.assertTrue(str.startsWith("2024"));
 	context.assertTrue(str.endsWith("000"));
 	context.assertEquals(str.length, 21);
 
