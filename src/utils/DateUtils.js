@@ -436,13 +436,38 @@ class	DateUtils
 		return DateUtils.TimestampToDayNumber(ts);
 	}
 
+	static	YearMonthToDayNumber(_yearMonth, _sep = "-")
+	{
+		// split it
+		let	[year, month] = _yearMonth.split(_sep);
+
+		// create the timestamp for it
+		let timestampMonth = Date.UTC(year, month-1, 1, 0, 0, 0, 0) / 1000;
+
+		return DateUtils.TimestampToDayNumber(timestampMonth);
+	}
+
+	static	AddToYearMonth(_yearMonth, _add = 1, _sep = "-")
+	{
+		// split it
+		let	[year, month] = _yearMonth.split(_sep);
+
+		// create a new date
+		let	date = new Date(year, month-1+_add, 1);
+
+		// export it
+		let	mm = date.getUTCMonth() + 1; // getMonth() is zero-based
+		return [date.getUTCFullYear(),
+				(mm>9 ? '' : '0') + mm
+				].join(_sep);
+	}
+
 	static	DayNumberToYearMonth(_dayNumber, _sep = "-")
 	{
 		// convert the day number to a date
 		let	date = DateUtils.DayToDate(_dayNumber);
 
 		let	mm = date.getUTCMonth() + 1; // getMonth() is zero-based
-
 		return [date.getUTCFullYear(),
 				(mm>9 ? '' : '0') + mm
 				].join(_sep);

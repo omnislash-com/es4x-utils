@@ -493,6 +493,83 @@ suite.test("DateUtils.DayNumberToYearMonth", function (context) {
 
 });
 
+suite.test("DateUtils.YearMonthToDayNumber", function (context) {
+
+	let	tests = [
+		{
+			result: 8613,
+			month: "2023-08"
+		},
+		{
+			result: 8735,
+			month: "2023-12"
+		},
+		{
+			result: 8766,
+			month: "2024-01"
+		},
+		{
+			result: 8948,
+			month: "2024-07"
+		},				
+	];
+
+	for(let test of tests)
+	{
+		let	result = DateUtils.YearMonthToDayNumber(test.month);
+		if (result != test.result)
+		{
+			console.error("Error with " + result + " not equals to " + test.result + ", month = " + test.month);
+		}		
+
+		context.assertEquals(result, test.result);
+	}
+
+});
+
+suite.test("DateUtils.AddToYearMonth", function (context) {
+
+	let	tests = [
+		{
+			add: 1,
+			month: "2023-08",
+			result: "2023-09"
+		},
+		{
+			add: -1,
+			month: "2023-08",
+			result: "2023-07"
+		},
+		{
+			add: 0,
+			month: "2023-08",
+			result: "2023-08"
+		},
+		{
+			add: 4,
+			month: "2023-08",
+			result: "2023-12"
+		},
+		{
+			add: 1,
+			month: "2023-12",
+			result: "2024-01"
+		},
+	];
+
+	for(let test of tests)
+	{
+		let	result = DateUtils.AddToYearMonth(test.month, test.add);
+		if (result != test.result)
+		{
+			console.error("Error with " + result + " not equals to " + test.result + ", month = " + test.month);
+		}		
+
+		context.assertEquals(result, test.result);
+	}
+
+});
+
 suite.test("DateUtils.NowToUniqString", function (context) {
 
 	// get it
