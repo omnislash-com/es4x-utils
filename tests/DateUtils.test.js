@@ -689,7 +689,111 @@ suite.test("DateUtils.IsDate", async function (context) {
 	}
 });
 
+suite.test("DateUtils.AddMonth", function (context) {
 
+	let	tests = [
+		{
+			"str": "1999-12-31T23:59:59.999999Z",
+			"increment": 0,
+			"result": "1999-12-31T23:59:59.999Z"
+		},
+		{
+			"str": "1999-12-31T23:59:59.999999Z",
+			"increment": 1,
+			"result": "2000-01-31T23:59:59.999Z"
+		},
+		{
+			"str": "1998-12-31T23:59:59.999999Z",
+			"increment": 2,
+			"result": "1999-02-28T23:59:59.999Z"
+		},
+		{
+			"str": "2023-12-31T23:59:59.999999Z",
+			"increment": 2,
+			"result": "2024-02-29T23:59:59.999Z"
+		},
+		{
+			"str": "2024-01-31T23:59:59.999999Z",
+			"increment": 3,
+			"result": "2024-04-30T23:59:59.999Z"
+		},
+		{
+			"str": "2024-01-05T23:59:59.999999Z",
+			"increment": 3,
+			"result": "2024-04-05T23:59:59.999Z"
+		},
+	];
+
+	for(let i=0; i<tests.length; i++)
+	{
+		// add months
+		let	result = DateUtils.AddMonth(tests[i].str, tests[i].increment);
+
+		if (result != tests[i].result)
+		{
+			console.error("Error at test " + i + ": " + result + " different than " + tests[i].result);
+		}
+
+		context.assertEquals(result, tests[i].result);
+	}
+
+});
+
+suite.test("DateUtils.AddPeriod", function (context) {
+
+	let	tests = [
+		{
+			"str": "1999-12-31T23:59:59.999999Z",
+			"period": "month",
+			"increment": 0,
+			"result": "1999-12-31T23:59:59.999Z"
+		},
+		{
+			"str": "1999-12-31T23:59:59.999999Z",
+			"period": "month",
+			"increment": 1,
+			"result": "2000-01-31T23:59:59.999Z"
+		},
+		{
+			"str": "1998-12-31T23:59:59.999999Z",
+			"period": "month",
+			"increment": 2,
+			"result": "1999-02-28T23:59:59.999Z"
+		},
+		{
+			"str": "2023-12-31T23:59:59.999999Z",
+			"period": "month",
+			"increment": 2,
+			"result": "2024-02-29T23:59:59.999Z"
+		},
+		{
+			"str": "2024-01-31T23:59:59.999999Z",
+			"period": "month",
+			"increment": 3,
+			"result": "2024-04-30T23:59:59.999Z"
+		},
+		{
+			"str": "2024-01-05T23:59:59.999999Z",
+			"period": "month",
+			"increment": 3,
+			"result": "2024-04-05T23:59:59.999Z"
+		},
+	];
+
+	for(let i=0; i<tests.length; i++)
+	{
+		// add period
+		let	result = DateUtils.AddPeriod(tests[i].str, tests[i].period, tests[i].increment);
+
+		if (result != tests[i].result)
+		{
+			console.error("Error at test " + i + ": " + result + " different than " + tests[i].result);
+		}
+
+		context.assertEquals(result, tests[i].result);
+	}
+
+});
 
 
 suite.run();

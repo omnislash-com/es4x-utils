@@ -4,6 +4,9 @@ const { MathUtils } = require("./MathUtils");
 
 class	DateUtils
 {
+	static	get	PERIOD_MONTH()			{ return "month"; }	
+
+
 	/**
 	 * @param {number} _dateSince2000: number of days since 01/01/2000
 	 */
@@ -365,6 +368,62 @@ class	DateUtils
 	{
 		let	timestamp = DateUtils.ParseToTimestamp(_dateStr);
 		return new Date(timestamp * 1000);
+	}
+
+	static	IsLeapYear(_year)
+	{
+		return (((_year % 4 === 0) && (_year % 100 !== 0)) || (_year % 400 === 0));
+	}
+
+	static	GetDaysInMonth(_year, _month)
+	{
+		return [31, (DateUtils.IsLeapYear(_year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][_month];
+	}
+
+
+
+	static	AddMonth(_dateStr, _increment = 1, _returnStr = true, _keepHours = true)
+	{
+		// parse the date
+		let	date = DateUtils.ParseToDate(_dateStr);
+
+		// save the current hour and minutes
+		let	hours = date.getUTCHours();
+		let	minutes = date.getUTCMinutes();
+
+		// save the current day then reset the day
+		let	n = date.getDate();
+		date.setDate(1);
+
+		// add month
+		date.setMonth(date.getMonth() + _increment);
+
+		// make sure we have a valid date
+		date.setDate(Math.min(n, DateUtils.GetDaysInMonth(date.getFullYear(), date.getMonth())));
+
+		// keep the hours?
+		if (_keepHours == true)
+		{
+			date.setUTCHours(hours);
+			date.setUTCMinutes(minutes);
+		}
+
+		if (_returnStr == true)
+			return DateUtils.DateToZuluStr(date);
+		else
+			return date;
+	}
+
+	static	AddPeriod(_dateStr, _period, _increment = 1, _returnStr = true, _keepHours = true)
+	{
+		// How many months to add?
+		let	nbMonths = 0;
+
+		// - month
+		if (_period == DateUtils.PERIOD_MONTH)
+			nbMonths = _increment;
+
+		return DateUtils.AddMonth(_dateStr, nbMonths, _returnStr, _keepHours);
 	}
 
 	static	AddTimezoneToTimestamp(_ts, _timezone)
