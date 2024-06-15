@@ -1,6 +1,7 @@
 const { ObjUtils } = require("./ObjUtils");
 const { ArrayUtils } = require("./ArrayUtils");
 const { MathUtils } = require("./MathUtils");
+const { intarystrtohex } = require("jsrsasign");
 
 class	DateUtils
 {
@@ -380,7 +381,19 @@ class	DateUtils
 		return [31, (DateUtils.IsLeapYear(_year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][_month];
 	}
 
+	static	DateStrToMonthYearString(_dateStr)
+	{
+		// parse it
+		let	date = DateUtils.ParseToDate(_dateStr);
 
+		// get the month
+		let	monthStr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][date.getUTCMonth()];
+
+		// get the year
+		let	yearStr = date.getUTCFullYear().toString();
+
+		return monthStr + " " + yearStr;
+	}
 
 	static	AddMonth(_dateStr, _increment = 1, _returnStr = true, _keepHours = true)
 	{
@@ -392,14 +405,14 @@ class	DateUtils
 		let	minutes = date.getUTCMinutes();
 
 		// save the current day then reset the day
-		let	n = date.getDate();
-		date.setDate(1);
+		let	n = date.getUTCDate();
+		date.setUTCDate(1);
 
 		// add month
-		date.setMonth(date.getMonth() + _increment);
+		date.setUTCMonth(date.getUTCMonth() + _increment);
 
 		// make sure we have a valid date
-		date.setDate(Math.min(n, DateUtils.GetDaysInMonth(date.getFullYear(), date.getMonth())));
+		date.setUTCDate(Math.min(n, DateUtils.GetDaysInMonth(date.getUTCFullYear(), date.getUTCMonth())));
 
 		// keep the hours?
 		if (_keepHours == true)

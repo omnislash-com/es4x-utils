@@ -795,5 +795,81 @@ suite.test("DateUtils.AddPeriod", function (context) {
 
 });
 
+suite.test("DateUtils.DateStrToMonthYearString", function (context) {
+
+	let	tests = [
+		{
+			"str": "1999-12-31T23:59:59.999999Z",
+			"result": "December 1999"
+		},
+		{
+			"str": "2023-12-31T23:59:59.999999Z",
+			"result": "December 2023"
+		},
+		{
+			"str": "2024-01-31T23:59:59.999999Z",
+			"result": "January 2024"
+		},
+		{
+			"str": "2024-02-05T23:59:59.999999Z",
+			"result": "February 2024"
+		},
+		{
+			"str": "2024-03-01T23:59:59.999999Z",
+			"result": "March 2024"
+		},
+		{
+			"str": "2024-04-29T23:59:59.999999Z",
+			"result": "April 2024"
+		},
+		{
+			"str": "2024-05-04T23:59:59.999999Z",
+			"result": "May 2024"
+		},
+		{
+			"str": "2024-06-30T23:59:59.999999Z",
+			"result": "June 2024"
+		},
+		{
+			"str": "2024-07-01T23:59:59.999999Z",
+			"result": "July 2024"
+		},
+		{
+			"str": "2024-08-12T23:59:59.999999Z",
+			"result": "August 2024"
+		},
+		{
+			"str": "2024-09-10T23:59:59.999999Z",
+			"result": "September 2024"
+		},
+		{
+			"str": "2024-10-10T23:59:59.999999Z",
+			"result": "October 2024"
+		},
+		{
+			"str": "2024-11-11T23:59:59.999999Z",
+			"result": "November 2024"
+		},
+		{
+			"str": "2024-12-10T23:59:59.999999Z",
+			"result": "December 2024"
+		},
+	];
+
+	for(let i=0; i<tests.length; i++)
+	{
+		// add period
+		let	result = DateUtils.DateStrToMonthYearString(tests[i].str);
+
+		if (result != tests[i].result)
+		{
+			console.error("Error at test " + i + ": " + result + " different than " + tests[i].result);
+		}
+
+		context.assertEquals(result, tests[i].result);
+	}
+
+});
+
 
 suite.run();
