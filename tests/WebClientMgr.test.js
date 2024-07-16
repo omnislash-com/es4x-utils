@@ -8,6 +8,29 @@ import { StringUtils } from '../src/utils/StringUtils';
 
 const suite = TestSuite.create("ES4X Test: WebClientMgr");
 
+suite.test("WebClientMgr.postForm", async function (context) {
+
+	let async = context.async();
+
+	let	webClient = new WebClientMgr(vertx);
+
+	// GET
+	let	host = "test.salesforce.com";
+	let path = "/services/oauth2/token";
+	let	method = QueryUtils.HTTP_METHOD_POST;
+	let	data = {
+		grant_type: "password",
+		client_id: "3MVG9fdJGowvdgN3LGHs9IIC7ejLelwAb9PiP6r7BPdyz91W6oCHHoWq5GAGX22Oal6av3Rv.Xa1yNWuaCTdb",
+		client_secret: "843EF781DF41396EA7DF6A441C118CB1D2189BD34A804B5FD9CA56B7756A2393",
+		username: "michael@omnislash.com.chapdemo",
+		password: "SaleCneirM!Omn30831BmrpzNhCx7r7fKab36glKC"
+	};
+
+	let	response = await webClient.query(method, host, path, data, {}, true, false, 443, true, true);
+
+	context.assertEquals(ObjUtils.GetValueToInt(response, "statusCode"), 200);
+	async.complete();
+});
 
 suite.test("WebClientMgr.query", async function (context) {
 

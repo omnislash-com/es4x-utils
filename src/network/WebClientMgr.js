@@ -1,5 +1,6 @@
 import { WebClientOptions } from '@vertx/web-client/options';
 import { WebClient } from '@vertx/web-client';
+import { MultiMap } from '@vertx/core';
 import { Buffer } from '@vertx/core';
 import { StringUtils } from '../utils/StringUtils';
 
@@ -17,7 +18,7 @@ class	WebClientMgr
 		this.__webClient = WebClient.create(_vertx, opt);
 	}
 
-	async	query(_method, _host, _path, _data = null, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true)
+	async	query(_method, _host, _path, _data = null, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true, _dataIsForm = false)
 	{
 		// depending on the method
 		let	result = null;
@@ -35,7 +36,7 @@ class	WebClientMgr
 		// POST
 		else if (_method == QueryUtils.HTTP_METHOD_POST)
 		{
-			result = await this.post(_host, _path, _data, _headers, _toJson, _dataIsJson, _port, _ssl);
+			result = await this.post(_host, _path, _data, _headers, _toJson, _dataIsJson, _port, _ssl, _dataIsForm);
 		}				
 		// PATCH
 		else if (_method == QueryUtils.HTTP_METHOD_PATCH)
@@ -97,7 +98,7 @@ class	WebClientMgr
 		return await this.sendRequest(query, request, _headers, _toJson);
 	}
 
-	async	post(_host, _path, _data, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true)
+	async	post(_host, _path, _data, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true, _dataIsForm = false)
 	{
 		// save the param object
 		let	query = {
@@ -117,7 +118,7 @@ class	WebClientMgr
 		request = request.ssl(_ssl);
 
 		// send it
-		return await this.sendRequest(query, request, _headers, _toJson, _data, _dataIsJson);
+		return await this.sendRequest(query, request, _headers, _toJson, _data, _dataIsJson, _dataIsForm);
 	}	
 
 	async	patch(_host, _path, _data, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true)
@@ -166,7 +167,7 @@ class	WebClientMgr
 		return await this.sendRequest(query, request, _headers, _toJson, _data, _dataIsJson);
 	}		
 
-	async	sendRequest(_query, _request, _headers, _toJson, _data = null, _dataIsJson = true)
+	async	sendRequest(_query, _request, _headers, _toJson, _data = null, _dataIsJson = true, _dataIsForm = false)
 	{
 		// set the headers
 		for(const key in _headers)
@@ -186,6 +187,19 @@ class	WebClientMgr
 				// is the data JSON?
 				if (_dataIsJson == true)
 					result = await _request.sendJson(_data);
+				// form?
+				else if (_dataIsForm == true)
+				{
+					// prepare the form
+					let	formData = MultiMap.caseInsensitiveMultiMap();
+					for(let key in _data)
+					{
+						formData.set(key, _data[key]);
+					}
+
+					// send it
+					result = await _request.sendForm(formData);
+				}
 				// Buffer
 				else
 					result = await _request.sendBuffer(Buffer.buffer(_data));
