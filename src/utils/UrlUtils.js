@@ -564,7 +564,21 @@ class	UrlUtils
 		return finalChunks.join("&");
 	}
 
-	
+	static	AppendQueryParametersToUrl(_url, _parameters)
+	{
+		// build the query string with the parameters
+		let	parametersEncoded = [];
+		for(let key in _parameters)
+		{
+			parametersEncoded.push(key + "=" + encodeURIComponent(_parameters[key]));
+		}
+
+		// nothing?
+		if (parametersEncoded.length == 0)
+			return _url;
+		
+		return _url + "?" + parametersEncoded.join("&");
+	}	
 }
 
 module.exports = {

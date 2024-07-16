@@ -406,6 +406,45 @@ suite.test("UrlUtils.ExtractReferrerInfo", function (context) {
 });
 
 
+suite.test("UrlUtils.AppendQueryParametersToUrl", function (context) {
+
+	let	tests = [
+		{
+			"url": "https://www.google.com",
+			"parameters": {
+
+			},
+			"result" : "https://www.google.com"
+		},
+		{
+			"url": "https://www.google.com",
+			"parameters": {
+				"p1": "test"
+			},
+			"result" : "https://www.google.com?p1=test"
+		},
+		{
+			"url": "https://www.google.com",
+			"parameters": {
+				"p1": "test",
+				"p2": 120
+			},
+			"result" : "https://www.google.com?p1=test&p2=120"
+		},
+	];
+
+	for(let i=0; i<tests.length; i++)
+	{
+		// get the info
+		let	result = UrlUtils.AppendQueryParametersToUrl(tests[i].url, tests[i].parameters);
+
+		if (result != tests[i].result)
+			console.error("Error at test " + i + ": " + result + " VS " + tests[i].result);
+		context.assertEquals(result, tests[i].result);
+	}
+
+});
+
 
 
 suite.run();
