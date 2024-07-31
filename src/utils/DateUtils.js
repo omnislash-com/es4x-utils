@@ -766,15 +766,19 @@ class	DateUtils
 		}
 	}	
 
-	static	GetTimezoneOffset(_id)
+	static	GetTimezoneOffset(_id, _timestamp = 0)
 	{
 		const	TimeZone = Java.type('java.util.TimeZone');
 		const	Date = Java.type('java.util.Date');
 
 		try
 		{
+			// If we don't have a timestamp we get right now?
+			if (_timestamp <= 0)
+				_timestamp = new Date().getTime();
+
 			let	tz = TimeZone.getTimeZone(_id);
-			return tz.getOffset(new Date().getTime()) / 1000 / 60;
+			return tz.getOffset(_timestamp) / 1000 / 60;
 		}
 		catch
 		{
@@ -826,7 +830,7 @@ class	DateUtils
 		if (StringUtils.IsEmpty(_tz) == false)
 		{
 			str += " (GMT";
-			let	offset = DateUtils.GetTimezoneOffset(_tz);
+			let	offset = DateUtils.GetTimezoneOffset(_tz, timestamp * 1000);
 			if (offset != 0)
 			{
 				// add the + or -

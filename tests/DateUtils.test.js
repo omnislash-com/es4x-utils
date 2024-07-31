@@ -604,25 +604,39 @@ suite.test("DateUtils.GetTimezoneOffset", async function (context) {
 	let	tests = [
 		{
 			timezone: null,
+			timestamp: 0,
 			offset: 0
 		},
 		{
 			timezone: "",
+			timestamp: 0,
 			offset: 0
 		},
 		{
 			timezone: "GMT",
+			timestamp: 0,
 			offset: 0
 		},
 		{
 			timezone: "America/Los_Angeles",
+			timestamp: 0,
 			offset: -420//-480
+		},
+		{
+			timezone: "America/Los_Angeles",
+			timestamp: DateUtils.DayToDate(9040).getTime(),	// Oct 1st
+			offset: -420//-480
+		},
+		{
+			timezone: "America/Los_Angeles",
+			timestamp: DateUtils.DayToDate(9100).getTime(),	// Nov 30th
+			offset: -480
 		},
 	];
 
 	for(let test of tests)
 	{
-		let	result = DateUtils.GetTimezoneOffset(test.timezone);
+		let	result = DateUtils.GetTimezoneOffset(test.timezone, test.timestamp);
 		context.assertEquals(test.offset, result);
 	}
 
@@ -905,11 +919,18 @@ suite.test("DateUtils.FormatDayTimeTZ", async function (context) {
 			timezone: "Europe/Paris",
 			result: "Tue Oct 1, 2024 4:30pm (GMT+2)"
 		},		
+		{
+			day: 9100,
+			time: 1630,
+			timezone: "Europe/Paris",
+			result: "Sat Nov 30, 2024 4:30pm (GMT+1)"
+		},		
 	];
 
 	for(let test of tests)
 	{
 		let	result = DateUtils.FormatDayTimeTZ(test.day, test.time, test.timezone);
+		console.log(result);
 		context.assertEquals(test.result, result);
 	}
 
