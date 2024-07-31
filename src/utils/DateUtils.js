@@ -1,6 +1,7 @@
 const { ObjUtils } = require("./ObjUtils");
 const { ArrayUtils } = require("./ArrayUtils");
 const { MathUtils } = require("./MathUtils");
+const { StringUtils } = require("./StringUtils");
 const { intarystrtohex } = require("jsrsasign");
 
 class	DateUtils
@@ -26,7 +27,7 @@ class	DateUtils
 		let	timestamp = Date.UTC(2000, 0, 1, 0, 0, 0, 0) / 1000;
 
 		// add the days
-		timestamp += _dateSince2000 * 24*60*60
+		timestamp += _dateSince2000 * 24*60*60;
 
 		return timestamp;
 	}
@@ -525,10 +526,11 @@ class	DateUtils
 		let	[year, month] = _yearMonth.split(_sep);
 
 		// create a new date
-		let	date = new Date(year, month-1+_add, 1);
+		let	date = new Date(Date.UTC(year, month-1+_add, 1, 0, 0, 0));
 
 		// export it
 		let	mm = date.getUTCMonth() + 1; // getMonth() is zero-based
+
 		return [date.getUTCFullYear(),
 				(mm>9 ? '' : '0') + mm
 				].join(_sep);
@@ -554,15 +556,30 @@ class	DateUtils
 		return DateUtils.DateToDayOfTheWeek(date);
 	}
 
-	static	DateToDayOfTheWeek(_date)
+	static	DateToDayOfTheWeek(_date, _abbr = false)
 	{
 		// array with list of days
-		let	days = [
+		let	days = _abbr ? [
+			"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+		] : [
 			"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"
 		];
 
 		// return it
 		return days[_date.getUTCDay()];		
+	}
+
+	static	DateToMonth(_date, _abbr = false)
+	{
+		// array with list of days
+		let	days = _abbr ? [
+			"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+		] : [
+			"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+		];
+
+		// return it
+		return days[_date.getUTCMonth()];		
 	}
 
 	static	GetClosestMondayToDayNumber(_dayNumber)
@@ -763,7 +780,71 @@ class	DateUtils
 		{
 			return 0;
 		}
-	}	
+	}
+
+	static	FormatAmPm(_hours, _minutes)
+	{
+		var ampm = _hours >= 12 ? 'pm' : 'am';
+		_hours = _hours % 12;
+		_hours = _hours ? _hours : 12; // the hour '0' should be '12'
+		_minutes = _minutes < 10 ? '0'+_minutes : _minutes;
+		return _hours + ':' + _minutes + ampm;
+	}
+
+	static	FormatDayTimeTZ(_day, _time, _tz)
+	{
+		// Wed Jul 31, 2024 6:30pm (GMT+2)
+		// get the timestamp for the day
+		let	timestamp = DateUtils.DayToTimestamp(_day);
+
+		// convert it to a date
+		let	date = new Date(timestamp * 1000);
+
+		// build the string
+		let	str = "";
+
+		// - day of the week abbreviation
+		str += DateUtils.DateToDayOfTheWeek(date, true) + " ";
+
+		// - month abbreviation
+		str += DateUtils.DateToMonth(date, true) + " ";
+
+		// - day number
+		str += date.getUTCDate() + ", ";
+
+		// - year
+		str += date.getUTCFullYear() + " ";
+
+		// extract the hours and minutes
+		let	hours = Math.floor(_time / 100);
+		let	minutes = _time - hours*100;
+
+		// - time
+		str += DateUtils.FormatAmPm(hours, minutes);
+
+		// - timezone
+		if (StringUtils.IsEmpty(_tz) == false)
+		{
+			str += " (GMT";
+			let	offset = DateUtils.GetTimezoneOffset(_tz);
+			if (offset != 0)
+			{
+				// add the + or -
+				str += offset < 0 ? "-" : "+";
+
+				// format the time
+				offset = Math.abs(offset);
+				let	offsetHours = Math.floor(offset / 60);
+				let	offsetMinutes = offset - offsetHours * 60;
+				str += offsetHours;
+				if (offsetMinutes > 0)
+					str += ":" + offsetMinutes;
+			}
+			str += ")";
+		}
+
+		return str;
+	}
 }
 
 module.exports = {

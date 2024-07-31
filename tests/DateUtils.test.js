@@ -872,4 +872,48 @@ suite.test("DateUtils.DateStrToMonthYearString", function (context) {
 });
 
 
+suite.test("DateUtils.FormatDayTimeTZ", async function (context) {
+
+	let	tests = [
+		{
+			day: 9040,
+			time: 1200,
+			timezone: "America/Los_Angeles",
+			result: "Tue Oct 1, 2024 12:00pm (GMT-7)"
+		},
+		{
+			day: 9040,
+			time: 1200,
+			timezone: "Europe/Paris",
+			result: "Tue Oct 1, 2024 12:00pm (GMT+2)"
+		},
+		{
+			day: 9040,
+			time: 0,
+			timezone: "Europe/Paris",
+			result: "Tue Oct 1, 2024 12:00am (GMT+2)"
+		},
+		{
+			day: 9040,
+			time: 100,
+			timezone: "Europe/Paris",
+			result: "Tue Oct 1, 2024 1:00am (GMT+2)"
+		},
+		{
+			day: 9040,
+			time: 1630,
+			timezone: "Europe/Paris",
+			result: "Tue Oct 1, 2024 4:30pm (GMT+2)"
+		},		
+	];
+
+	for(let test of tests)
+	{
+		let	result = DateUtils.FormatDayTimeTZ(test.day, test.time, test.timezone);
+		context.assertEquals(test.result, result);
+	}
+
+});
+
+
 suite.run();
