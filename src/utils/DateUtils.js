@@ -509,6 +509,24 @@ class	DateUtils
 		return DateUtils.TimestampToDayNumber(ts);
 	}
 
+	static	NowToLocalDayNumberAndTime(_timezone=0)
+	{
+		// get the timestamp
+		let	ts = DateUtils.NowToLocalTimestamp(_timezone);
+
+		// get the day number
+		let	day = DateUtils.TimestampToDayNumber(ts);
+
+		// calculate the hours / minutes
+		let	date = new Date(ts*1000);
+		let	time = date.getHours() * 100 + date.getMinutes();
+
+		return {
+			day: day,
+			time: time
+		};
+	}
+
 	static	YearMonthToDayNumber(_yearMonth, _sep = "-")
 	{
 		// split it

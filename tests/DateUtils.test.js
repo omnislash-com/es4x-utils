@@ -937,4 +937,17 @@ suite.test("DateUtils.FormatDayTimeTZ", async function (context) {
 });
 
 
+suite.test("DateUtils.NowToLocalDayNumberAndTime", async function (context) {
+
+
+	// get it
+	let	result = DateUtils.NowToLocalDayNumberAndTime();
+	console.log(new Date(DateUtils.NowToLocalTimestamp()*1000));
+	console.log(result);
+
+	context.assertEquals(1, 1);
+});
+
+
+
 suite.run();
