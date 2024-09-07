@@ -949,5 +949,29 @@ suite.test("DateUtils.NowToLocalDayNumberAndTime", async function (context) {
 });
 
 
+suite.test("DateUtils.DayToDateStr", async function (context) {
+
+	let	tests = [
+		{
+			day: 9084,
+			hours: 0,
+			result: "2024-11-14T00:00:00.000Z"
+		},
+		{
+			day: 9084,
+			hours: 12,
+			result: "2024-11-14T12:00:00.000Z"
+		},
+	];
+
+	for(let test of tests)
+	{
+		let	result = DateUtils.DayToDateStr(test.day, test.hours);
+		context.assertEquals(test.result, result);
+	}
+
+});
+
+
 
 suite.run();

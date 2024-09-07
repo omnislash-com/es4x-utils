@@ -12,10 +12,13 @@ class	DateUtils
 	/**
 	 * @param {number} _dateSince2000: number of days since 01/01/2000
 	 */
-	static	DayToDate(_dateSince2000)
+	static	DayToDate(_dateSince2000, _addHours = 0)
 	{
 		// get the timestamp
 		let	timestamp = DateUtils.DayToTimestamp(_dateSince2000);
+
+		// add hours
+		timestamp += _addHours * 60 * 60;
 
 		// convert to date
 		return new Date(timestamp * 1000);
@@ -36,9 +39,9 @@ class	DateUtils
 	/**
 	 * @param {number} _dateSince2000: number of days since 01/01/2000
 	 */
-	static	DayToDateStr(_dateSince2000)
+	static	DayToDateStr(_dateSince2000, _addHours = 0)
 	{	
-		let	date = DateUtils.DayToDate(_dateSince2000);
+		let	date = DateUtils.DayToDate(_dateSince2000, _addHours);
 		return date.toISOString();
 	}
 
