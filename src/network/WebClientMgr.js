@@ -26,7 +26,7 @@ class	WebClientMgr
 		// GET
 		if (_method == QueryUtils.HTTP_METHOD_GET)
 		{
-			result = await this.get(_host, _path, _headers, _toJson, _port, _ssl, _data);
+			result = await this.get(_host, _path, _headers, _toJson, _port, _ssl, _data, _dataIsJson, _dataIsForm);
 		}
 		// DELETE
 		else if (_method == QueryUtils.HTTP_METHOD_DEL)
@@ -184,6 +184,8 @@ class	WebClientMgr
 			// do we have data?
 			if (_data != null)
 			{
+				console.log("data: ");
+				console.log(_data);
 				// is the data JSON?
 				if (_dataIsJson == true)
 					result = await _request.sendJson(_data);
