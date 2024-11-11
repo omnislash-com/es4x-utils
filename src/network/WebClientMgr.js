@@ -184,8 +184,6 @@ class	WebClientMgr
 			// do we have data?
 			if (_data != null)
 			{
-				console.log("data: ");
-				console.log(_data);
 				// is the data JSON?
 				if (_dataIsJson == true)
 					result = await _request.sendJson(_data);
