@@ -26,7 +26,7 @@ class	WebClientMgr
 		// GET
 		if (_method == QueryUtils.HTTP_METHOD_GET)
 		{
-			result = await this.get(_host, _path, _headers, _toJson, _port, _ssl);
+			result = await this.get(_host, _path, _headers, _toJson, _port, _ssl, _data);
 		}
 		// DELETE
 		else if (_method == QueryUtils.HTTP_METHOD_DEL)
@@ -56,7 +56,7 @@ class	WebClientMgr
 		return result;
 	}
 
-	async	get(_host, _path, _headers = {}, _toJson = false, _port = 443, _ssl = true)
+	async	get(_host, _path, _headers = {}, _toJson = false, _port = 443, _ssl = true, _data = null)
 	{
 		// save the param object
 		let	query = {
@@ -74,7 +74,7 @@ class	WebClientMgr
 		request = request.ssl(_ssl);
 
 		// send it
-		return await this.sendRequest(query, request, _headers, _toJson);
+		return await this.sendRequest(query, request, _headers, _toJson, _data);
 	}
 
 	async	delete(_host, _path, _headers = {}, _toJson = false, _port = 443, _ssl = true)
