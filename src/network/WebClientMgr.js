@@ -113,7 +113,6 @@ class	WebClientMgr
 	{
 		// create the request
 		let	request = this.__webClient.getAbs(_url);
-		console.log(request);
 
 		// send it
 		try
