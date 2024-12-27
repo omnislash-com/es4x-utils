@@ -56,6 +56,90 @@ class	WebClientMgr
 		return result;
 	}
 
+	static	BufferToBase64(_buffer)
+	{
+		const base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+		const byteLength = _buffer.length();
+		const remainingBytesCount = byteLength % 3;
+		const mainLength = byteLength - remainingBytesCount;
+
+		let string = "";
+		let i = 0;
+
+		for (; i < mainLength; i += 3) {
+			const chunk = (_buffer.getUnsignedByte(i) << 16) | (_buffer.getUnsignedByte(i+1) << 8) | _buffer.getUnsignedByte(i+2);
+			string += base64Chars[(chunk & 0b111111000000000000000000) >> 18];
+			string += base64Chars[(chunk & 0b000000111111000000000000) >> 12];
+			string += base64Chars[(chunk & 0b000000000000111111000000) >> 6];
+			string += base64Chars[(chunk & 0b000000000000000000111111)];
+		}
+
+		if (remainingBytesCount === 2) {
+			const chunk = (_buffer.getUnsignedByte(i) << 16) | (_buffer.getUnsignedByte(i+1) << 8);
+			string += base64Chars[(chunk & 0b111111000000000000000000) >> 18];
+			string += base64Chars[(chunk & 0b000000111111000000000000) >> 12];
+			string += base64Chars[(chunk & 0b000000000000111111000000) >> 6];
+			string += "=";
+
+		} else if (remainingBytesCount === 1) {
+			const chunk = (_buffer.getUnsignedByte(i) << 16);
+			string += base64Chars[(chunk & 0b111111000000000000000000) >> 18];
+			string += base64Chars[(chunk & 0b000000111111000000000000) >> 12];
+			string += "==";
+		}
+
+		return string;
+	}
+
+	async	downloadFileToBase64(_url)
+	{
+		// download the file
+		let	file = await this.downloadFile(_url);
+
+		// if we have it, we convert it to base64
+		if (file != null)
+		{
+			return WebClientMgr.BufferToBase64(file);
+		}
+		else
+		{
+			LogUtils.LogError("Error downloading the file: ", _url);
+			return null;
+		}
+	}
+
+	async	downloadFile(_url)
+	{
+		// create the request
+		let	request = this.__webClient.getAbs(_url);
+		console.log(request);
+
+		// send it
+		try
+		{
+			// send the query
+			let	result = await request.send();
+
+			// extract the redirection URL
+			if (result != null)
+			{
+				return result.bodyAsBuffer();
+			}
+			else
+			{
+				LogUtils.LogError("WEB error getting the data from: ", _url);
+				return null;
+			}
+		}
+		catch(e)
+		{
+			LogUtils.LogException(e);
+			LogUtils.LogError("WEB error getting the redirect url from: ", _url);
+			return null;
+		}				
+	}
+
 	async	get(_host, _path, _headers = {}, _toJson = false, _port = 443, _ssl = true, _data = null, _dataIsJson = true, _dataIsForm = false)
 	{
 		// save the param object

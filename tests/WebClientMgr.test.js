@@ -5,8 +5,28 @@ import { ObjUtils } from '../src/utils/ObjUtils';
 import { WebClientMgr } from '../src/network/WebClientMgr';
 import { QueryUtils } from '../src/network/QueryUtils';
 import { StringUtils } from '../src/utils/StringUtils';
+import { Buffer } from '@vertx/core';
 
 const suite = TestSuite.create("ES4X Test: WebClientMgr");
+
+suite.test("WebClientMgr.downloadFileToBase64", async function (context) {
+
+	let async = context.async();
+
+	let	webClient = new WebClientMgr(vertx);
+
+	// GET
+	let	url = "https://www.snexplores.org/wp-content/uploads/2020/03/1030_oceanwaves-1028x579.png";
+
+	let	response = await webClient.downloadFileToBase64(url);
+
+	context.assertTrue(response != null);
+
+//	await vertx.fileSystem().writeFile("test.log", Buffer.buffer(response));
+
+	async.complete();
+});
+
 
 suite.test("WebClientMgr.postForm", async function (context) {
 
