@@ -816,9 +816,17 @@ class	DateUtils
 		return _hours + ':' + _minutes + ampm;
 	}
 
-	static	FormatDayTimeTZ(_day, _time, _tz, _dateIsUtc = true)
+	static	GetDateFromDayTimeTZ(_day, _time, _tz, _dateIsUtc = true)
 	{
-		// Wed Jul 31, 2024 6:30pm (GMT+2)
+		// get the timestamp for the day
+		let	timestamp = DateUtils.GetTimestampFromDayTimeTZ(_day, _time, _tz, _dateIsUtc);
+
+		// convert it to a date
+		return new Date(timestamp * 1000);
+	}
+
+	static	GetTimestampFromDayTimeTZ(_day, _time, _tz, _dateIsUtc = true)
+	{
 		// get the timestamp for the day
 		let	timestamp = DateUtils.DayToTimestamp(_day);
 
@@ -836,6 +844,14 @@ class	DateUtils
 			// shift it
 			timestamp += timezoneOffset * 60;
 		}
+
+		return timestamp;
+	}
+
+	static	FormatDayTimeTZ(_day, _time, _tz, _dateIsUtc = true)
+	{
+		// get the timestamp
+		let	timestamp = DateUtils.GetTimestampFromDayTimeTZ(_day, _time, _tz, _dateIsUtc);
 
 		// convert it to a date
 		let	date = new Date(timestamp * 1000);
@@ -862,6 +878,7 @@ class	DateUtils
 		if (StringUtils.IsEmpty(_tz) == false)
 		{
 			str += " (GMT";
+			let	timezoneOffset = (StringUtils.IsEmpty(_tz) == false) ? DateUtils.GetTimezoneOffset(_tz, timestamp * 1000) : 0;
 			if (timezoneOffset != 0)
 			{
 				// add the + or -
