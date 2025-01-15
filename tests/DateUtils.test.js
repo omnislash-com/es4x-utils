@@ -577,7 +577,7 @@ suite.test("DateUtils.NowToUniqString", function (context) {
 
 	// test
 	console.log("Now uniq = " + str);
-	context.assertTrue(str.startsWith("2024"));
+	context.assertTrue(str.startsWith("2025"));
 	context.assertTrue(str.endsWith("000"));
 	context.assertEquals(str.length, 21);
 
@@ -620,12 +620,12 @@ suite.test("DateUtils.GetTimezoneOffset", async function (context) {
 		{
 			timezone: "America/Los_Angeles",
 			timestamp: 0,
-			offset: -420//-480
+			offset: -480//-420
 		},
 		{
 			timezone: "America/Los_Angeles",
 			timestamp: DateUtils.DayToDate(9040).getTime(),	// Oct 1st
-			offset: -420//-480
+			offset: -420//-420
 		},
 		{
 			timezone: "America/Los_Angeles",
@@ -891,39 +891,45 @@ suite.test("DateUtils.FormatDayTimeTZ", async function (context) {
 	let	tests = [
 		{
 			day: 9040,
+			time: 200,
+			timezone: "America/Los_Angeles",
+			result: "Mon Sep 30, 2024 7:00pm (GMT-7)"
+		},
+		{
+			day: 9040,
 			time: 1200,
 			timezone: "America/Los_Angeles",
-			result: "Tue Oct 1, 2024 12:00pm (GMT-7)"
+			result: "Tue Oct 1, 2024 5:00am (GMT-7)"
 		},
 		{
 			day: 9040,
 			time: 1200,
 			timezone: "Europe/Paris",
-			result: "Tue Oct 1, 2024 12:00pm (GMT+2)"
+			result: "Tue Oct 1, 2024 2:00pm (GMT+2)"
 		},
 		{
 			day: 9040,
 			time: 0,
 			timezone: "Europe/Paris",
-			result: "Tue Oct 1, 2024 12:00am (GMT+2)"
+			result: "Tue Oct 1, 2024 2:00am (GMT+2)"
 		},
 		{
 			day: 9040,
 			time: 100,
 			timezone: "Europe/Paris",
-			result: "Tue Oct 1, 2024 1:00am (GMT+2)"
+			result: "Tue Oct 1, 2024 3:00am (GMT+2)"
 		},
 		{
 			day: 9040,
 			time: 1630,
 			timezone: "Europe/Paris",
-			result: "Tue Oct 1, 2024 4:30pm (GMT+2)"
+			result: "Tue Oct 1, 2024 6:30pm (GMT+2)"
 		},		
 		{
 			day: 9100,
 			time: 1630,
 			timezone: "Europe/Paris",
-			result: "Sat Nov 30, 2024 4:30pm (GMT+1)"
+			result: "Sat Nov 30, 2024 5:30pm (GMT+1)"
 		},		
 	];
 

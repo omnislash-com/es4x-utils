@@ -816,11 +816,26 @@ class	DateUtils
 		return _hours + ':' + _minutes + ampm;
 	}
 
-	static	FormatDayTimeTZ(_day, _time, _tz)
+	static	FormatDayTimeTZ(_day, _time, _tz, _dateIsUtc = true)
 	{
 		// Wed Jul 31, 2024 6:30pm (GMT+2)
 		// get the timestamp for the day
 		let	timestamp = DateUtils.DayToTimestamp(_day);
+
+		// extract the hours and minutes
+		let	hours = Math.floor(_time / 100);
+		let	minutes = _time - hours*100;
+		
+		// add the time
+		timestamp += hours * 60 * 60 + minutes * 60;
+
+		// if the time is in UTC and if we have a timezone, we shift it
+		let	timezoneOffset = (StringUtils.IsEmpty(_tz) == false) ? DateUtils.GetTimezoneOffset(_tz, timestamp * 1000) : 0;
+		if (_dateIsUtc == true)
+		{
+			// shift it
+			timestamp += timezoneOffset * 60;
+		}
 
 		// convert it to a date
 		let	date = new Date(timestamp * 1000);
@@ -840,27 +855,22 @@ class	DateUtils
 		// - year
 		str += date.getUTCFullYear() + " ";
 
-		// extract the hours and minutes
-		let	hours = Math.floor(_time / 100);
-		let	minutes = _time - hours*100;
-
 		// - time
-		str += DateUtils.FormatAmPm(hours, minutes);
+		str += DateUtils.FormatAmPm(date.getUTCHours(), date.getUTCMinutes());
 
 		// - timezone
 		if (StringUtils.IsEmpty(_tz) == false)
 		{
 			str += " (GMT";
-			let	offset = DateUtils.GetTimezoneOffset(_tz, timestamp * 1000);
-			if (offset != 0)
+			if (timezoneOffset != 0)
 			{
 				// add the + or -
-				str += offset < 0 ? "-" : "+";
+				str += timezoneOffset < 0 ? "-" : "+";
 
 				// format the time
-				offset = Math.abs(offset);
-				let	offsetHours = Math.floor(offset / 60);
-				let	offsetMinutes = offset - offsetHours * 60;
+				timezoneOffset = Math.abs(timezoneOffset);
+				let	offsetHours = Math.floor(timezoneOffset / 60);
+				let	offsetMinutes = timezoneOffset - offsetHours * 60;
 				str += offsetHours;
 				if (offsetMinutes > 0)
 					str += ":" + offsetMinutes;
