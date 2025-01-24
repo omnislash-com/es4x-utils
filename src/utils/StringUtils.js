@@ -639,6 +639,84 @@ class	StringUtils
 		else
 			return _txt;
 	}
+
+	static	CSVToJSON(_text, _delimiter = ',')
+	{
+		// convert to array
+		let	lines = this.CSVToArray(_text, _delimiter);
+
+		// get the headers
+		let	headers = lines[0];
+
+		// build the final objects
+		let	objects = [];
+		for(let i = 1; i < lines.length; i++)
+		{
+			let	line = lines[i];
+			// make sure we have the same number of values and headers
+			if (line.length != headers.length)
+				continue;
+
+			// create the object
+			let	object = {};
+			for(let j = 0; j < headers.length; j++)
+			{
+				object[headers[j]] = line[j];
+			}
+			objects.push(object);
+		}
+
+		return objects;
+	  }
+
+	static	CSVToArray (_text, _delimiter = ",")
+	{
+		_delimiter = (_delimiter || ","); // user-supplied delimeter or default comma
+		
+		var pattern = new RegExp( // regular expression to parse the CSV values.
+			( // Delimiters:
+			"(\\" + _delimiter + "|\\r?\\n|\\r|^)" +
+			// Quoted fields.
+			"(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+			// Standard fields.
+			"([^\"\\" + _delimiter + "\\r\\n]*))"
+			), "gi"
+		);
+		
+		var rows = [[]];  // array to hold our data. First row is column headers.
+		// array to hold our individual pattern matching groups:
+		var matches = false; // false if we don't find any matches
+		// Loop until we no longer find a regular expression match
+		while (matches = pattern.exec( _text ))
+		{
+			var matched_delimiter = matches[1]; // Get the matched delimiter
+			// Check if the delimiter has a length (and is not the start of string)
+			// and if it matches field delimiter. If not, it is a row delimiter.
+			if (matched_delimiter.length && matched_delimiter !== _delimiter)
+			{
+				// Since this is a new row of data, add an empty row to the array.
+				rows.push( [] );
+			}
+			var matched_value;
+			// Once we have eliminated the delimiter, check to see
+			// what kind of value was captured (quoted or unquoted):
+			if (matches[2])
+			{ // found quoted value. unescape any double quotes.
+				matched_value = matches[2].replace(
+				new RegExp( "\"\"", "g" ), "\""
+				);
+			}
+			else
+			{ // found a non-quoted value
+				matched_value = matches[3];
+			}
+			// Now that we have our value string, let's add
+			// it to the data array.
+			rows[rows.length - 1].push(matched_value);
+		}
+		return rows; // Return the parsed data Array
+	}
+
 }
 
 module.exports = {
