@@ -640,17 +640,21 @@ class	StringUtils
 			return _txt;
 	}
 
-	static	CSVToJSON(_text, _delimiter = ',')
+	static	CSVToJSON(_text, _delimiter = ',', _header = 0)
 	{
 		// convert to array
 		let	lines = this.CSVToArray(_text, _delimiter);
 
+		// do we have enough lines?
+		if (lines.length <= (_header + 1))
+			return [];
+
 		// get the headers
-		let	headers = lines[0];
+		let	headers = lines[_header];
 
 		// build the final objects
 		let	objects = [];
-		for(let i = 1; i < lines.length; i++)
+		for(let i = _header + 1; i < lines.length; i++)
 		{
 			let	line = lines[i];
 			// make sure we have the same number of values and headers
