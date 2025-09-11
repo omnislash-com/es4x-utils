@@ -46,3 +46,9 @@ console.log(ObjUtils.GetValue(obj, "field"));	// output: 10
 console.log(ObjUtils.GetValue(obj, "nested.inside"));	// output: "here"
 console.log(ObjUtils.GetValue(obj, "list[1].index"));	// output: 1
 ```
+
+## Dependencies
+Change Java version to 11
+```bash
+export JAVA_HOME=`/usr/libexec/java_home -v 11`
+```

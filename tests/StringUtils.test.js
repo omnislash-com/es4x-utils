@@ -619,4 +619,141 @@ suite.test("StringUtils.EnsureSize", async function (context) {
 	}
 });
 
+suite.test("StringUtils.FormatPhone", async function (context) {
+
+	let	tests = [
+		// Basic 10-digit numbers without extension
+		{
+			phone: "5551234567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "555-123-4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "(555) 123-4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "555.123.4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "555 123 4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		
+		// 11-digit numbers with country code 1
+		{
+			phone: "15551234567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "1-555-123-4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "+1 (555) 123-4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "1.555.123.4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		
+		// Numbers with extensions provided as parameter
+		{
+			phone: "5551234567",
+			extension: "123",
+			result: "+1235551234567"
+		},
+		{
+			phone: "555-123-4567",
+			extension: "44",
+			result: "+445551234567"
+		},
+		{
+			phone: "(555) 123-4567",
+			extension: "86",
+			result: "+865551234567"
+		},
+		
+		// Numbers that already have extensions (>10 digits)
+		{
+			phone: "15551234567890",
+			extension: "",
+			result: "+15551234567890"
+		},
+		{
+			phone: "555123456789",
+			extension: "",
+			result: "+555123456789"
+		},
+		{
+			phone: "1-555-123-4567-ext-999",
+			extension: "",
+			result: "+15551234567999"
+		},
+		
+		// Edge cases
+		{
+			phone: "",
+			extension: "1",
+			result: ""
+		},
+		{
+			phone: "123",
+			extension: "",
+			result: "+1123"
+		},
+		{
+			phone: "12345",
+			extension: "44",
+			result: "+4412345"
+		},
+		
+		// International-style numbers
+		{
+			phone: "447700900123",
+			extension: "",
+			result: "+447700900123"
+		},
+		{
+			phone: "+33123456789",
+			extension: "",
+			result: "+33123456789"
+		},
+		
+		// Numbers with default extension when no extension provided
+		{
+			phone: "5551234567",
+			extension: "",
+			result: "+15551234567"
+		}
+	];
+	
+	for(let i=0; i<tests.length; i++)
+	{
+		// convert it
+		let	value = StringUtils.FormatPhone(tests[i].phone, tests[i].extension);
+
+		if (value != tests[i].result)
+		{
+			console.error("Error: StringUtils.FormatPhone(" + i + ")");
+		}
+		context.assertEquals(value, tests[i].result);
+
+	}
+});
+
 suite.run();

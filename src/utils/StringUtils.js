@@ -726,6 +726,34 @@ class	StringUtils
 		return _str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 	}
 
+	// format a phone number to E.164 format
+	// _phone: the phone number to format
+	// _extension: the extension to use if the phone number doesn't have one
+	// _defaultExtension: the default extension to use if the phone number doesn't have one
+	static	FormatPhone(_phone, _extension = "", _defaultExtension = "1")
+	{
+		// empty?
+		if (StringUtils.IsEmpty(_phone) == true)
+			return "";
+
+		// remove any non-numeric characters
+		_phone = _phone.replace(/[^0-9]/g, "");
+
+		// if more than 10, that means we have an extension
+		let	finalExtension = "";
+		if (_phone.length > 10)
+		{
+			finalExtension = _phone.substring(0, _phone.length - 10);
+			_phone = _phone.substring(finalExtension.length);
+		}
+		else if (StringUtils.IsEmpty(_extension) == false)
+			finalExtension = _extension;
+		else if (StringUtils.IsEmpty(_defaultExtension) == false)
+			finalExtension = _defaultExtension;
+
+		// return the phone number
+		return "+" + finalExtension + _phone;
+	}
 }
 
 module.exports = {
