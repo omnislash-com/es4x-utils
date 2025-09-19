@@ -622,7 +622,7 @@ suite.test("StringUtils.EnsureSize", async function (context) {
 suite.test("StringUtils.FormatPhone", async function (context) {
 
 	let	tests = [
-		// Basic 10-digit numbers without extension
+		// Basic US/Canada 10-digit numbers
 		{
 			phone: "5551234567",
 			extension: "",
@@ -648,8 +648,8 @@ suite.test("StringUtils.FormatPhone", async function (context) {
 			extension: "",
 			result: "+15551234567"
 		},
-		
-		// 11-digit numbers with country code 1
+
+		// US/Canada with country code
 		{
 			phone: "15551234567",
 			extension: "",
@@ -670,47 +670,158 @@ suite.test("StringUtils.FormatPhone", async function (context) {
 			extension: "",
 			result: "+15551234567"
 		},
-		
-		// Numbers with extensions provided as parameter
+
+		// Numbers with letters (phone keypad conversion)
 		{
-			phone: "5551234567",
-			extension: "123",
-			result: "+1235551234567"
+			phone: "1-800-FLOWERS",
+			extension: "",
+			result: "+18003569377"
 		},
 		{
-			phone: "555-123-4567",
+			phone: "+1 (555) 123-CALL",
+			extension: "",
+			result: "+15551232255"
+		},
+		{
+			phone: "1-800-GOT-JUNK",
+			extension: "",
+			result: "+18004685865"
+		},
+
+		// International format with 00 prefix
+		{
+			phone: "001-555-123-4567",
+			extension: "",
+			result: "+15551234567"
+		},
+		{
+			phone: "00447700900123",
+			extension: "",
+			result: "+447700900123"
+		},
+		{
+			phone: "0033123456789",
+			extension: "",
+			result: "+33123456789"
+		},
+
+		// UK numbers
+		{
+			phone: "+44 20 1234 5678",
+			extension: "",
+			result: "+442012345678"
+		},
+		{
+			phone: "447700900123",
+			extension: "",
+			result: "+447700900123"
+		},
+		{
+			phone: "+44-7700-900123",
+			extension: "",
+			result: "+447700900123"
+		},
+
+		// France numbers
+		{
+			phone: "+33 1 23 45 67 89",
+			extension: "",
+			result: "+33123456789"
+		},
+		{
+			phone: "33612345678",
+			extension: "",
+			result: "+33612345678"
+		},
+
+		// Germany numbers
+		{
+			phone: "+49 30 12345678",
+			extension: "",
+			result: "+493012345678"
+		},
+		{
+			phone: "+49-176-12345678",
+			extension: "",
+			result: "+4917612345678"
+		},
+
+		// Brazil numbers (11 digits)
+		{
+			phone: "+55 11 98765 4321",
+			extension: "",
+			result: "+5511987654321"
+		},
+		{
+			phone: "5511987654321",
+			extension: "",
+			result: "+5511987654321"
+		},
+
+		// China numbers (11 digits)
+		{
+			phone: "+86 138 1234 5678",
+			extension: "",
+			result: "+8613812345678"
+		},
+		{
+			phone: "8613812345678",
+			extension: "",
+			result: "+8613812345678"
+		},
+
+		// India numbers
+		{
+			phone: "+91-98765-43210",
+			extension: "",
+			result: "+919876543210"
+		},
+		{
+			phone: "+91 98765 43210",
+			extension: "",
+			result: "+919876543210"
+		},
+
+		// Numbers with explicit country code parameter
+		{
+			phone: "5551234567",
 			extension: "44",
 			result: "+445551234567"
 		},
 		{
-			phone: "(555) 123-4567",
-			extension: "86",
-			result: "+865551234567"
-		},
-		
-		// Numbers that already have extensions (>10 digits)
-		{
-			phone: "15551234567890",
-			extension: "",
-			result: "+15551234567890"
+			phone: "7700900123",
+			extension: "44",
+			result: "+447700900123"
 		},
 		{
-			phone: "555123456789",
-			extension: "",
-			result: "+555123456789"
+			phone: "123456789",
+			extension: "33",
+			result: "+33123456789"
 		},
 		{
-			phone: "1-555-123-4567-ext-999",
-			extension: "",
-			result: "+15551234567999"
+			phone: "9876543210",
+			extension: "91",
+			result: "+919876543210"
 		},
-		
-		// Edge cases
+
+		// Edge cases - empty and invalid inputs
 		{
 			phone: "",
 			extension: "1",
 			result: ""
 		},
+		{
+			phone: "   ",
+			extension: "1",
+			result: ""
+		},
+		{
+			phone: "not-a-phone",
+			extension: "1",
+			result: ""
+		},
+
+		// Short numbers
 		{
 			phone: "123",
 			extension: "",
@@ -721,27 +832,88 @@ suite.test("StringUtils.FormatPhone", async function (context) {
 			extension: "44",
 			result: "+4412345"
 		},
-		
-		// International-style numbers
 		{
-			phone: "447700900123",
+			phone: "911",
+			extension: "1",
+			result: "+1911"
+		},
+
+		// E.164 length validation (max 15 digits)
+		{
+			phone: "12345678901234",  // 14 digits - will be treated as 1 + 13 digits
 			extension: "",
-			result: "+447700900123"
+			result: "+12345678901234"  // Country code 1 + 13 digits
 		},
 		{
-			phone: "+33123456789",
+			phone: "123456789012345",  // 15 digits exactly - valid E.164 length
 			extension: "",
-			result: "+33123456789"
+			result: "+123456789012345"  // Keeps all 15 digits as valid E.164
 		},
-		
-		// Numbers with default extension when no extension provided
 		{
-			phone: "5551234567",
+			phone: "+1234567890123456",  // 16 digits with +, should truncate
 			extension: "",
-			result: "+15551234567"
+			result: "+123456789012345"  // Max 15 digits total
+		},
+		{
+			phone: "+999123456789012",  // 3-digit country code + 12 digits = 15 total
+			extension: "",
+			result: "+999123456789012"
+		},
+
+		// Phone with extension text (should be removed)
+		{
+			phone: "+1-555-123-4567 ext. 999",
+			extension: "",
+			result: "+15551234567"  // Extension is removed for E.164 format
+		},
+		{
+			phone: "555-123-4567 x123",
+			extension: "",
+			result: "+15551234567"  // Extension is removed for E.164 format
+		},
+
+		// Mixed formatting
+		{
+			phone: "+44 (0) 20 1234 5678",
+			extension: "",
+			result: "+4402012345678"  // UK number with trunk code
+		},
+		{
+			phone: "📞 +33 6 12 34 56 78",
+			extension: "",
+			result: "+33612345678"
+		},
+
+		// Country code priority testing
+		{
+			phone: "+44 555 123 4567",  // Has country code 44
+			extension: "1",               // But extension 1 is provided
+			result: "+445551234567"       // Should use phone's country code
+		},
+		{
+			phone: "5551234567",          // No country code
+			extension: "44",              // Extension provided
+			result: "+445551234567"       // Should use extension
+		},
+
+		// Three-digit country codes
+		{
+			phone: "+351 912 345 678",
+			extension: "",
+			result: "+351912345678"
+		},
+		{
+			phone: "+358 40 1234567",
+			extension: "",
+			result: "+358401234567"
+		},
+		{
+			phone: "+353 87 123 4567",
+			extension: "",
+			result: "+353871234567"
 		}
 	];
-	
+
 	for(let i=0; i<tests.length; i++)
 	{
 		// convert it
@@ -749,9 +921,298 @@ suite.test("StringUtils.FormatPhone", async function (context) {
 
 		if (value != tests[i].result)
 		{
-			console.error("Error: StringUtils.FormatPhone(" + i + ")");
+			console.error(`Error: StringUtils.FormatPhone(${i}): input="${tests[i].phone}", extension="${tests[i].extension}", expected="${tests[i].result}", got="${value}"`);
 		}
 		context.assertEquals(value, tests[i].result);
+
+	}
+});
+
+suite.test("StringUtils.ExtractPhone", async function (context) {
+	let	tests = [
+		// Empty and edge cases
+		{
+			input: "",
+			defaultExtension: "1",
+			result: {"phone": "", "extension": ""}
+		},
+		{
+			input: "   ",
+			defaultExtension: "1",
+			result: {"phone": "", "extension": ""}
+		},
+		{
+			input: "not-a-phone",
+			defaultExtension: "1",
+			result: {"phone": "", "extension": ""}
+		},
+
+		// US/Canada numbers (10 digits)
+		{
+			input: "5551234567",
+			defaultExtension: "1",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "(555) 123-4567",
+			defaultExtension: "1",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "555-123-4567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": ""}
+		},
+		{
+			input: "555.123.4567",
+			defaultExtension: "1",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "555 123 4567",
+			defaultExtension: "1",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+
+		// US/Canada with country code
+		{
+			input: "+1-555-123-4567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "1-555-123-4567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "+1 (555) 123-4567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "15551234567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+
+		// International format with 00 prefix
+		{
+			input: "001-555-123-4567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": "1"}
+		},
+		{
+			input: "00447700900123",
+			defaultExtension: "",
+			result: {"phone": "7700900123", "extension": "44"}
+		},
+		{
+			input: "0033123456789",
+			defaultExtension: "",
+			result: {"phone": "123456789", "extension": "33"}
+		},
+
+		// UK numbers
+		{
+			input: "+44 20 1234 5678",
+			defaultExtension: "",
+			result: {"phone": "2012345678", "extension": "44"}
+		},
+		{
+			input: "+44-7700-900123",
+			defaultExtension: "",
+			result: {"phone": "7700900123", "extension": "44"}
+		},
+		{
+			input: "447700900123",
+			defaultExtension: "",
+			result: {"phone": "7700900123", "extension": "44"}
+		},
+
+		// France numbers
+		{
+			input: "+33 1 23 45 67 89",
+			defaultExtension: "",
+			result: {"phone": "123456789", "extension": "33"}
+		},
+		{
+			input: "+33-6-12-34-56-78",
+			defaultExtension: "",
+			result: {"phone": "612345678", "extension": "33"}
+		},
+		{
+			input: "33612345678",
+			defaultExtension: "",
+			result: {"phone": "612345678", "extension": "33"}
+		},
+
+		// Germany numbers
+		{
+			input: "+49 30 12345678",
+			defaultExtension: "",
+			result: {"phone": "3012345678", "extension": "49"}
+		},
+		{
+			input: "+49-176-12345678",
+			defaultExtension: "",
+			result: {"phone": "17612345678", "extension": "49"}
+		},
+
+		// Brazil numbers (11 digits)
+		{
+			input: "+55 11 98765 4321",
+			defaultExtension: "",
+			result: {"phone": "11987654321", "extension": "55"}
+		},
+		{
+			input: "5511987654321",
+			defaultExtension: "",
+			result: {"phone": "11987654321", "extension": "55"}
+		},
+
+		// China numbers (11 digits)
+		{
+			input: "+86 138 1234 5678",
+			defaultExtension: "",
+			result: {"phone": "13812345678", "extension": "86"}
+		},
+		{
+			input: "8613812345678",
+			defaultExtension: "",
+			result: {"phone": "13812345678", "extension": "86"}
+		},
+
+		// India numbers
+		{
+			input: "+91-98765-43210",
+			defaultExtension: "",
+			result: {"phone": "9876543210", "extension": "91"}
+		},
+		{
+			input: "+91 98765 43210",
+			defaultExtension: "",
+			result: {"phone": "9876543210", "extension": "91"}
+		},
+
+		// UAE numbers
+		{
+			input: "+971 50 779 2746",
+			defaultExtension: "",
+			result: {"phone": "507792746", "extension": "971"}
+		},
+		{
+			input: "+971507792746",
+			defaultExtension: "",
+			result: {"phone": "507792746", "extension": "971"}
+		},
+
+		// Three-digit country codes
+		{
+			input: "+351 912 345 678",
+			defaultExtension: "",
+			result: {"phone": "912345678", "extension": "351"}
+		},
+		{
+			input: "+358 40 1234567",
+			defaultExtension: "",
+			result: {"phone": "401234567", "extension": "358"}
+		},
+		{
+			input: "+353 87 123 4567",
+			defaultExtension: "",
+			result: {"phone": "871234567", "extension": "353"}
+		},
+
+		// Short numbers (less than 10 digits)
+		{
+			input: "123",
+			defaultExtension: "1",
+			result: {"phone": "123", "extension": "1"}
+		},
+		{
+			input: "12345",
+			defaultExtension: "44",
+			result: {"phone": "12345", "extension": "44"}
+		},
+
+		// Numbers without country code but longer than 10 digits
+		{
+			input: "12345678901",
+			defaultExtension: "",
+			result: {"phone": "2345678901", "extension": "1"}
+		},
+		{
+			input: "441234567890",
+			defaultExtension: "",
+			result: {"phone": "1234567890", "extension": "44"}
+		},
+
+		// Unrecognized country codes with + prefix
+		{
+			input: "+999 123 456 789",
+			defaultExtension: "",
+			result: {"phone": "123456789", "extension": "999"}
+		},
+		{
+			input: "+8 123 456 789",
+			defaultExtension: "",
+			result: {"phone": "23456789", "extension": "81"}  // 81 is Japan's code, algorithm finds it
+		},
+
+		// Mixed formatting
+		{
+			input: "+1 (555) 123-CALL",
+			defaultExtension: "",
+			result: {"phone": "5551232255", "extension": "1"}
+		},
+		{
+			input: "+44 (0) 20 1234 5678",
+			defaultExtension: "",
+			result: {"phone": "02012345678", "extension": "44"}
+		},
+
+		// Special characters
+		{
+			input: "+1-555-123-4567 ext. 999",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": "1"}  // PBX extensions are removed
+		},
+		{
+			input: "📞 +33 6 12 34 56 78",
+			defaultExtension: "",
+			result: {"phone": "612345678", "extension": "33"}
+		},
+
+		// Default extension behavior
+		{
+			input: "5551234567",
+			defaultExtension: "",
+			result: {"phone": "5551234567", "extension": ""}
+		},
+		{
+			input: "5551234567",
+			defaultExtension: null,
+			result: {"phone": "5551234567", "extension": ""}
+		},
+		{
+			input: "5551234567",
+			defaultExtension: undefined,
+			result: {"phone": "5551234567", "extension": ""}
+		}
+	];
+
+	for(let i=0; i<tests.length; i++)
+	{
+		// convert it
+		let	value = StringUtils.ExtractPhone(tests[i].input, tests[i].defaultExtension);
+
+		if (value.phone != tests[i].result.phone || value.extension != tests[i].result.extension)
+		{
+			console.error(`Error: StringUtils.ExtractPhone(${i}): input="${tests[i].input}", defaultExtension="${tests[i].defaultExtension}", expected={phone:"${tests[i].result.phone}",extension:"${tests[i].result.extension}"}, got={phone:"${value.phone}",extension:"${value.extension}"}`);
+		}
+		context.assertEquals(value.phone, tests[i].result.phone);
+		context.assertEquals(value.extension, tests[i].result.extension);
 
 	}
 });

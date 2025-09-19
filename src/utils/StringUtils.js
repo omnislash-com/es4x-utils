@@ -728,31 +728,484 @@ class	StringUtils
 
 	// format a phone number to E.164 format
 	// _phone: the phone number to format
-	// _extension: the extension to use if the phone number doesn't have one
-	// _defaultExtension: the default extension to use if the phone number doesn't have one
+	// _extension: the country code to use if the phone number doesn't have one
+	// _defaultExtension: the default country code to use if neither phone nor extension have one
 	static	FormatPhone(_phone, _extension = "", _defaultExtension = "1")
 	{
 		// empty?
 		if (StringUtils.IsEmpty(_phone) == true)
 			return "";
 
-		// remove any non-numeric characters
-		_phone = _phone.replace(/[^0-9]/g, "");
+		// Use ExtractPhone to intelligently parse the input
+		const extracted = StringUtils.ExtractPhone(_phone, "");
 
-		// if more than 10, that means we have an extension
-		let	finalExtension = "";
-		if (_phone.length > 10)
-		{
-			finalExtension = _phone.substring(0, _phone.length - 10);
-			_phone = _phone.substring(finalExtension.length);
+		// If no phone number was extracted, return empty
+		if (!extracted.phone || extracted.phone === "")
+			return "";
+
+		// Determine the country code to use
+		let countryCode = "";
+
+		// Priority order for country code:
+		// 1. Country code extracted from the phone number itself
+		// 2. Explicitly provided extension parameter
+		// 3. Default extension parameter
+		if (extracted.extension && extracted.extension !== "") {
+			countryCode = extracted.extension;
+		} else if (!StringUtils.IsEmpty(_extension)) {
+			countryCode = _extension;
+		} else if (!StringUtils.IsEmpty(_defaultExtension)) {
+			countryCode = _defaultExtension;
 		}
-		else if (StringUtils.IsEmpty(_extension) == false)
-			finalExtension = _extension;
-		else if (StringUtils.IsEmpty(_defaultExtension) == false)
-			finalExtension = _defaultExtension;
 
-		// return the phone number
-		return "+" + finalExtension + _phone;
+		// Clean the country code (remove any non-digits)
+		countryCode = countryCode.replace(/[^\d]/g, "");
+
+		// Get the phone number
+		let phoneNumber = extracted.phone;
+
+		// Validate E.164 format requirements
+		// E.164 numbers can have a maximum of 15 digits (not including the +)
+		const totalDigits = countryCode.length + phoneNumber.length;
+
+		if (totalDigits > 15) {
+			// Try to trim the phone number if it's too long
+			// This might happen if there's an extension appended
+			const maxPhoneLength = 15 - countryCode.length;
+			phoneNumber = phoneNumber.substring(0, maxPhoneLength);
+		}
+
+		// Validate country code (must be 1-3 digits)
+		if (countryCode.length < 1 || countryCode.length > 3) {
+			// If country code is invalid, try to use default
+			if (!StringUtils.IsEmpty(_defaultExtension)) {
+				countryCode = _defaultExtension.replace(/[^\d]/g, "");
+			}
+			// If still invalid, default to "1" (North America)
+			if (countryCode.length < 1 || countryCode.length > 3) {
+				countryCode = "1";
+			}
+		}
+
+		// Validate that we have a phone number
+		if (phoneNumber.length === 0) {
+			return "";
+		}
+
+		// Special handling for specific country formats
+		// Some countries have specific requirements
+		// Note: We should be careful not to be too strict as phone number formats can vary
+		const countryCodeInfo = {
+			"1": { minLength: 10, maxLength: 10 },    // US/Canada - strict 10 digits
+			"44": { minLength: 10, maxLength: 11 },   // UK - can be 10 or 11 with trunk code
+			"86": { minLength: 11, maxLength: 11 },   // China
+			"91": { minLength: 10, maxLength: 10 },   // India
+			"55": { minLength: 10, maxLength: 11 },   // Brazil
+		};
+
+		// Check if we have specific requirements for this country code
+		// Only apply strict formatting if we're confident about the country
+		if (countryCodeInfo[countryCode] && phoneNumber.length <= countryCodeInfo[countryCode].maxLength + 1) {
+			const info = countryCodeInfo[countryCode];
+			// Only apply country-specific limits if the number is close to expected length
+			// This avoids incorrectly truncating numbers that might be from different regions
+			if (phoneNumber.length > info.maxLength && phoneNumber.length <= info.maxLength + 1) {
+				// Slightly over limit, likely has an extra digit - trim
+				phoneNumber = phoneNumber.substring(0, info.maxLength);
+			}
+			// If way over the limit, don't trim - might be a different format entirely
+		}
+
+		// Final validation: ensure total length doesn't exceed 15 digits
+		const finalTotal = countryCode.length + phoneNumber.length;
+		if (finalTotal > 15) {
+			// This shouldn't happen if our logic above is correct, but just in case
+			const maxPhoneLength = 15 - countryCode.length;
+			phoneNumber = phoneNumber.substring(0, maxPhoneLength);
+		}
+
+		// Return the formatted E.164 number
+		return "+" + countryCode + phoneNumber;
+	}
+
+	// extract the phone number without any non digit characters, and extract the extension if any
+	// it takes in parameter the phone as a string, and a default extension, and return the cleaned phone and extension as two different strings
+	static	ExtractPhone(_phone, _defaultExtension)
+	{
+		// empty?
+		if (StringUtils.IsEmpty(_phone) == true)
+			return {"phone": "", "extension": ""};
+
+		// Handle default extension - only use "1" if truly undefined
+		// Also handle the string "undefined" which might come from test frameworks
+		if (typeof _defaultExtension === 'undefined' ||
+		    _defaultExtension === undefined ||
+		    _defaultExtension === "undefined") {
+			_defaultExtension = "";  // Don't use default if explicitly passed as undefined
+		} else if (_defaultExtension === null || _defaultExtension === "null") {
+			_defaultExtension = "";  // Don't use default if explicitly passed as null
+		}
+
+		// Common country codes with their expected phone lengths (without country code)
+		const countryCodeInfo = {
+			"1": { length: 10, name: "US/Canada" },           // US, Canada
+			"7": { length: 10, name: "Russia" },              // Russia
+			"20": { length: 10, name: "Egypt" },              // Egypt
+			"27": { length: 9, name: "South Africa" },        // South Africa
+			"30": { length: 10, name: "Greece" },             // Greece
+			"31": { length: 9, name: "Netherlands" },         // Netherlands
+			"32": { length: 9, name: "Belgium" },             // Belgium
+			"33": { length: 9, name: "France" },              // France
+			"34": { length: 9, name: "Spain" },               // Spain
+			"36": { length: 9, name: "Hungary" },             // Hungary
+			"39": { length: 10, name: "Italy" },              // Italy
+			"40": { length: 9, name: "Romania" },             // Romania
+			"41": { length: 9, name: "Switzerland" },         // Switzerland
+			"43": { length: 10, name: "Austria" },            // Austria
+			"44": { length: 10, name: "UK" },                 // UK
+			"45": { length: 8, name: "Denmark" },             // Denmark
+			"46": { length: 9, name: "Sweden" },              // Sweden
+			"47": { length: 8, name: "Norway" },              // Norway
+			"48": { length: 9, name: "Poland" },              // Poland
+			"49": { length: 10, name: "Germany" },            // Germany
+			"51": { length: 9, name: "Peru" },                // Peru
+			"52": { length: 10, name: "Mexico" },             // Mexico
+			"53": { length: 8, name: "Cuba" },                // Cuba
+			"54": { length: 10, name: "Argentina" },          // Argentina
+			"55": { length: 11, name: "Brazil" },             // Brazil
+			"56": { length: 9, name: "Chile" },               // Chile
+			"57": { length: 10, name: "Colombia" },           // Colombia
+			"58": { length: 10, name: "Venezuela" },          // Venezuela
+			"60": { length: 9, name: "Malaysia" },            // Malaysia
+			"61": { length: 9, name: "Australia" },           // Australia
+			"62": { length: 10, name: "Indonesia" },          // Indonesia
+			"63": { length: 10, name: "Philippines" },        // Philippines
+			"64": { length: 9, name: "New Zealand" },         // New Zealand
+			"65": { length: 8, name: "Singapore" },           // Singapore
+			"66": { length: 9, name: "Thailand" },            // Thailand
+			"81": { length: 10, name: "Japan" },              // Japan
+			"82": { length: 10, name: "South Korea" },        // South Korea
+			"84": { length: 9, name: "Vietnam" },             // Vietnam
+			"86": { length: 11, name: "China" },              // China
+			"90": { length: 10, name: "Turkey" },             // Turkey
+			"91": { length: 10, name: "India" },              // India
+			"92": { length: 10, name: "Pakistan" },           // Pakistan
+			"93": { length: 9, name: "Afghanistan" },         // Afghanistan
+			"94": { length: 9, name: "Sri Lanka" },           // Sri Lanka
+			"95": { length: 9, name: "Myanmar" },             // Myanmar
+			"98": { length: 10, name: "Iran" },               // Iran
+			"212": { length: 9, name: "Morocco" },            // Morocco
+			"213": { length: 9, name: "Algeria" },            // Algeria
+			"216": { length: 8, name: "Tunisia" },            // Tunisia
+			"218": { length: 9, name: "Libya" },              // Libya
+			"220": { length: 7, name: "Gambia" },             // Gambia
+			"221": { length: 9, name: "Senegal" },            // Senegal
+			"222": { length: 8, name: "Mauritania" },         // Mauritania
+			"223": { length: 8, name: "Mali" },               // Mali
+			"224": { length: 9, name: "Guinea" },             // Guinea
+			"225": { length: 10, name: "Ivory Coast" },       // Ivory Coast
+			"226": { length: 8, name: "Burkina Faso" },       // Burkina Faso
+			"227": { length: 8, name: "Niger" },              // Niger
+			"228": { length: 8, name: "Togo" },               // Togo
+			"229": { length: 8, name: "Benin" },              // Benin
+			"230": { length: 8, name: "Mauritius" },          // Mauritius
+			"231": { length: 8, name: "Liberia" },            // Liberia
+			"232": { length: 8, name: "Sierra Leone" },       // Sierra Leone
+			"233": { length: 9, name: "Ghana" },              // Ghana
+			"234": { length: 10, name: "Nigeria" },           // Nigeria
+			"235": { length: 8, name: "Chad" },               // Chad
+			"236": { length: 8, name: "Central African Republic" }, // Central African Republic
+			"237": { length: 9, name: "Cameroon" },           // Cameroon
+			"238": { length: 7, name: "Cape Verde" },         // Cape Verde
+			"239": { length: 7, name: "Sao Tome" },           // Sao Tome and Principe
+			"240": { length: 9, name: "Equatorial Guinea" },  // Equatorial Guinea
+			"241": { length: 7, name: "Gabon" },              // Gabon
+			"242": { length: 9, name: "Congo" },              // Republic of Congo
+			"243": { length: 9, name: "DR Congo" },           // Democratic Republic of Congo
+			"244": { length: 9, name: "Angola" },             // Angola
+			"245": { length: 9, name: "Guinea-Bissau" },      // Guinea-Bissau
+			"248": { length: 6, name: "Seychelles" },         // Seychelles
+			"249": { length: 9, name: "Sudan" },              // Sudan
+			"250": { length: 9, name: "Rwanda" },             // Rwanda
+			"251": { length: 9, name: "Ethiopia" },           // Ethiopia
+			"252": { length: 8, name: "Somalia" },            // Somalia
+			"253": { length: 8, name: "Djibouti" },           // Djibouti
+			"254": { length: 10, name: "Kenya" },             // Kenya
+			"255": { length: 9, name: "Tanzania" },           // Tanzania
+			"256": { length: 9, name: "Uganda" },             // Uganda
+			"257": { length: 8, name: "Burundi" },            // Burundi
+			"258": { length: 9, name: "Mozambique" },         // Mozambique
+			"260": { length: 9, name: "Zambia" },             // Zambia
+			"261": { length: 9, name: "Madagascar" },         // Madagascar
+			"262": { length: 9, name: "Reunion" },            // Reunion
+			"263": { length: 9, name: "Zimbabwe" },           // Zimbabwe
+			"264": { length: 9, name: "Namibia" },            // Namibia
+			"265": { length: 9, name: "Malawi" },             // Malawi
+			"266": { length: 8, name: "Lesotho" },            // Lesotho
+			"267": { length: 8, name: "Botswana" },           // Botswana
+			"268": { length: 8, name: "Swaziland" },          // Swaziland
+			"269": { length: 7, name: "Comoros" },            // Comoros
+			"297": { length: 7, name: "Aruba" },              // Aruba
+			"298": { length: 6, name: "Faroe Islands" },      // Faroe Islands
+			"299": { length: 6, name: "Greenland" },          // Greenland
+			"350": { length: 8, name: "Gibraltar" },          // Gibraltar
+			"351": { length: 9, name: "Portugal" },           // Portugal
+			"352": { length: 9, name: "Luxembourg" },         // Luxembourg
+			"353": { length: 9, name: "Ireland" },            // Ireland
+			"354": { length: 7, name: "Iceland" },            // Iceland
+			"355": { length: 9, name: "Albania" },            // Albania
+			"356": { length: 8, name: "Malta" },              // Malta
+			"357": { length: 8, name: "Cyprus" },             // Cyprus
+			"358": { length: 9, name: "Finland" },            // Finland
+			"359": { length: 9, name: "Bulgaria" },           // Bulgaria
+			"370": { length: 8, name: "Lithuania" },          // Lithuania
+			"371": { length: 8, name: "Latvia" },             // Latvia
+			"372": { length: 8, name: "Estonia" },            // Estonia
+			"373": { length: 8, name: "Moldova" },            // Moldova
+			"374": { length: 8, name: "Armenia" },            // Armenia
+			"375": { length: 9, name: "Belarus" },            // Belarus
+			"376": { length: 6, name: "Andorra" },            // Andorra
+			"377": { length: 8, name: "Monaco" },             // Monaco
+			"378": { length: 10, name: "San Marino" },        // San Marino
+			"380": { length: 9, name: "Ukraine" },            // Ukraine
+			"381": { length: 9, name: "Serbia" },             // Serbia
+			"382": { length: 8, name: "Montenegro" },         // Montenegro
+			"383": { length: 9, name: "Kosovo" },             // Kosovo
+			"385": { length: 9, name: "Croatia" },            // Croatia
+			"386": { length: 8, name: "Slovenia" },           // Slovenia
+			"387": { length: 8, name: "Bosnia" },             // Bosnia and Herzegovina
+			"389": { length: 8, name: "Macedonia" },          // North Macedonia
+			"420": { length: 9, name: "Czech Republic" },     // Czech Republic
+			"421": { length: 9, name: "Slovakia" },           // Slovakia
+			"423": { length: 7, name: "Liechtenstein" },      // Liechtenstein
+			"500": { length: 5, name: "Falkland Islands" },   // Falkland Islands
+			"501": { length: 7, name: "Belize" },             // Belize
+			"502": { length: 8, name: "Guatemala" },          // Guatemala
+			"503": { length: 8, name: "El Salvador" },        // El Salvador
+			"504": { length: 8, name: "Honduras" },           // Honduras
+			"505": { length: 8, name: "Nicaragua" },          // Nicaragua
+			"506": { length: 8, name: "Costa Rica" },         // Costa Rica
+			"507": { length: 8, name: "Panama" },             // Panama
+			"508": { length: 6, name: "St Pierre" },          // St Pierre and Miquelon
+			"509": { length: 8, name: "Haiti" },              // Haiti
+			"590": { length: 9, name: "Guadeloupe" },         // Guadeloupe
+			"591": { length: 8, name: "Bolivia" },            // Bolivia
+			"592": { length: 7, name: "Guyana" },             // Guyana
+			"593": { length: 9, name: "Ecuador" },            // Ecuador
+			"594": { length: 9, name: "French Guiana" },      // French Guiana
+			"595": { length: 9, name: "Paraguay" },           // Paraguay
+			"596": { length: 9, name: "Martinique" },         // Martinique
+			"597": { length: 7, name: "Suriname" },           // Suriname
+			"598": { length: 8, name: "Uruguay" },            // Uruguay
+			"599": { length: 7, name: "Netherlands Antilles" }, // Netherlands Antilles
+			"670": { length: 8, name: "East Timor" },         // East Timor
+			"672": { length: 6, name: "Norfolk Island" },     // Norfolk Island
+			"673": { length: 7, name: "Brunei" },             // Brunei
+			"674": { length: 7, name: "Nauru" },              // Nauru
+			"675": { length: 8, name: "Papua New Guinea" },   // Papua New Guinea
+			"676": { length: 5, name: "Tonga" },              // Tonga
+			"677": { length: 7, name: "Solomon Islands" },    // Solomon Islands
+			"678": { length: 7, name: "Vanuatu" },            // Vanuatu
+			"679": { length: 7, name: "Fiji" },               // Fiji
+			"680": { length: 7, name: "Palau" },              // Palau
+			"681": { length: 6, name: "Wallis and Futuna" },  // Wallis and Futuna
+			"682": { length: 5, name: "Cook Islands" },       // Cook Islands
+			"683": { length: 4, name: "Niue" },               // Niue
+			"685": { length: 7, name: "Samoa" },              // Samoa
+			"686": { length: 5, name: "Kiribati" },           // Kiribati
+			"687": { length: 6, name: "New Caledonia" },      // New Caledonia
+			"688": { length: 5, name: "Tuvalu" },             // Tuvalu
+			"689": { length: 6, name: "French Polynesia" },   // French Polynesia
+			"690": { length: 4, name: "Tokelau" },            // Tokelau
+			"691": { length: 7, name: "Micronesia" },         // Micronesia
+			"692": { length: 7, name: "Marshall Islands" },   // Marshall Islands
+			"850": { length: 10, name: "North Korea" },       // North Korea
+			"852": { length: 8, name: "Hong Kong" },          // Hong Kong
+			"853": { length: 8, name: "Macau" },              // Macau
+			"855": { length: 9, name: "Cambodia" },           // Cambodia
+			"856": { length: 9, name: "Laos" },               // Laos
+			"880": { length: 10, name: "Bangladesh" },        // Bangladesh
+			"886": { length: 9, name: "Taiwan" },             // Taiwan
+			"960": { length: 7, name: "Maldives" },           // Maldives
+			"961": { length: 8, name: "Lebanon" },            // Lebanon
+			"962": { length: 9, name: "Jordan" },             // Jordan
+			"963": { length: 9, name: "Syria" },              // Syria
+			"964": { length: 10, name: "Iraq" },              // Iraq
+			"965": { length: 8, name: "Kuwait" },             // Kuwait
+			"966": { length: 9, name: "Saudi Arabia" },       // Saudi Arabia
+			"967": { length: 9, name: "Yemen" },              // Yemen
+			"968": { length: 8, name: "Oman" },               // Oman
+			"970": { length: 9, name: "Palestine" },          // Palestine
+			"971": { length: 9, name: "UAE" },                // United Arab Emirates
+			"972": { length: 9, name: "Israel" },             // Israel
+			"973": { length: 8, name: "Bahrain" },            // Bahrain
+			"974": { length: 8, name: "Qatar" },              // Qatar
+			"975": { length: 8, name: "Bhutan" },             // Bhutan
+			"976": { length: 8, name: "Mongolia" },           // Mongolia
+			"977": { length: 10, name: "Nepal" },             // Nepal
+			"992": { length: 9, name: "Tajikistan" },         // Tajikistan
+			"993": { length: 8, name: "Turkmenistan" },       // Turkmenistan
+			"994": { length: 9, name: "Azerbaijan" },         // Azerbaijan
+			"995": { length: 9, name: "Georgia" },            // Georgia
+			"996": { length: 9, name: "Kyrgyzstan" },         // Kyrgyzstan
+			"998": { length: 9, name: "Uzbekistan" }          // Uzbekistan
+		};
+
+		// First, check if it starts with 00 and convert to +
+		_phone = _phone.replace(/^00/, '+');
+
+		// Check if the phone has a + at the beginning
+		const hasPlus = _phone.startsWith('+');
+
+		// Check if it looks like a phone number (has digits or common phone patterns)
+		const hasDigits = /\d/.test(_phone);
+		const looksLikePhone = hasDigits || hasPlus || /^[\s\(\)\-\+\.]+$/.test(_phone);
+
+		// Only convert letters to numbers if it looks like a phone number
+		if (looksLikePhone && hasDigits) {
+			// Remove common extension indicators and everything after them
+			// This handles formats like "555-123-4567 x123" or "555-123-4567 ext. 999"
+			_phone = _phone.replace(/\s*(ext\.?|extension|x)\s*\d+/gi, '');
+
+			// Convert letters to numbers (phone keypad mapping) - only in phone-like contexts
+			// But only for the main phone number part, not after clear separators
+			const parts = _phone.split(/[\s\-\.\(\)]+/);
+			_phone = parts.map(part => {
+				// If part is all letters and looks like a word (like CALL), convert it
+				if (/^[A-Za-z]+$/.test(part) && part.length <= 10) {
+					return part.toUpperCase()
+						.replace(/[ABC]/g, '2')
+						.replace(/[DEF]/g, '3')
+						.replace(/[GHI]/g, '4')
+						.replace(/[JKL]/g, '5')
+						.replace(/[MNO]/g, '6')
+						.replace(/[PQRS]/g, '7')
+						.replace(/[TUV]/g, '8')
+						.replace(/[WXYZ]/g, '9');
+				}
+				return part;
+			}).join(' ');
+		}
+
+		// Remove all non-numeric characters except the leading +
+		let cleaned = _phone.replace(/[^\d+]/g, '');
+		// Ensure only one + at the beginning
+		if (hasPlus) {
+			cleaned = '+' + cleaned.replace(/\+/g, '');
+		} else {
+			cleaned = cleaned.replace(/\+/g, '');
+		}
+
+		// If no digits at all, return empty
+		const digitsOnly = cleaned.replace(/\+/g, '');
+		if (digitsOnly.length === 0) {
+			return {"phone": "", "extension": ""};
+		}
+
+		let extension = "";
+		let phoneNumber = digitsOnly;
+
+		// Try to detect country code
+		if (hasPlus || digitsOnly.length > 10) {
+			// Try to match country code (check 1-3 digit prefixes)
+			let matchedCode = null;
+
+			// Start with the longest possible match (3 digits), then 2, then 1
+			for (let len = 3; len >= 1; len--) {
+				const potentialCode = digitsOnly.substring(0, len);
+				if (countryCodeInfo[potentialCode]) {
+					matchedCode = potentialCode;
+					break;
+				}
+			}
+
+			if (matchedCode) {
+				extension = matchedCode;
+				phoneNumber = digitsOnly.substring(matchedCode.length);
+
+				// If the phone number is longer than expected for this country,
+				// it might contain an extension or additional digits
+				// For now, we'll just keep all the digits as the phone number
+				// (You could add logic here to extract extensions based on country-specific rules)
+			} else if (hasPlus) {
+				// Has + but no recognized country code
+				// For unrecognized codes, we need to make educated guesses
+				// Check if it starts with 9 (which could be 9xx codes)
+				if (digitsOnly.startsWith('9') && digitsOnly.length >= 12) {
+					// Could be a 3-digit code starting with 9 (like 999)
+					// Check if treating as 3-digit code leaves reasonable phone length
+					const remainingAfter3 = digitsOnly.length - 3;
+					if (remainingAfter3 >= 7 && remainingAfter3 <= 15) {
+						extension = digitsOnly.substring(0, 3);
+						phoneNumber = digitsOnly.substring(3);
+					} else if (digitsOnly.length >= 12) {
+						// Try 2-digit code
+						extension = digitsOnly.substring(0, 2);
+						phoneNumber = digitsOnly.substring(2);
+					} else {
+						// Fall back to 1-digit
+						extension = digitsOnly.substring(0, 1);
+						phoneNumber = digitsOnly.substring(1);
+					}
+				} else if (digitsOnly.length > 10) {
+					// Try to guess: if total length > 11, probably has country code
+					if (digitsOnly.length >= 13) {
+						// Likely a 3-digit country code
+						extension = digitsOnly.substring(0, 3);
+						phoneNumber = digitsOnly.substring(3);
+					} else if (digitsOnly.length >= 12) {
+						// Likely a 2-digit country code
+						extension = digitsOnly.substring(0, 2);
+						phoneNumber = digitsOnly.substring(2);
+					} else {
+						// Likely a 1-digit country code
+						extension = digitsOnly.substring(0, 1);
+						phoneNumber = digitsOnly.substring(1);
+					}
+				} else {
+					// Short number with +, treat first digit as country code
+					extension = digitsOnly.substring(0, 1);
+					phoneNumber = digitsOnly.substring(1);
+				}
+			} else if (digitsOnly.length > 10) {
+				// No + but more than 10 digits, try to detect country code
+				// Check if it starts with a known country code
+				let found = false;
+				for (let len = 3; len >= 1; len--) {
+					const potentialCode = digitsOnly.substring(0, len);
+					if (countryCodeInfo[potentialCode]) {
+						extension = potentialCode;
+						phoneNumber = digitsOnly.substring(len);
+						found = true;
+						break;
+					}
+				}
+
+				// If no known country code found, use the old logic
+				// (everything before the last 10 digits is the extension)
+				if (!found) {
+					extension = digitsOnly.substring(0, digitsOnly.length - 10);
+					phoneNumber = digitsOnly.substring(extension.length);
+				}
+			}
+		}
+
+		// If no extension was detected and default is provided, use it
+		// Only use default extension if it's explicitly provided and non-empty
+		// Also check for "undefined" and "null" strings which might come from test frameworks
+		if (extension === "" &&
+		    typeof _defaultExtension === 'string' &&
+		    _defaultExtension !== "" &&
+		    _defaultExtension !== "undefined" &&
+		    _defaultExtension !== "null") {
+			extension = _defaultExtension;
+		}
+
+		// Return the result
+		return {
+			"phone": phoneNumber,
+			"extension": extension
+		};
 	}
 }
 
